@@ -1600,6 +1600,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         else {
             JSValue result = jsBoolean(JSValue::equalSlowCase(callFrame, src1, src2));
             CHECK_FOR_EXCEPTION();
+			//result.label = src1.label.join(src2.label);
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -4864,7 +4865,7 @@ void Interpreter::retrieveLastCaller(CallFrame* callFrame, int& lineNumber, intp
     if (callerFrame->hasHostCallFrameFlag())
         return;
 
-    CodeBlock* callerCodeBlock = callerFrame->codeBlock();
+    CodeBlock* callerCodeBlock = callerFrame->codeBlock();   
     if (!callerCodeBlock)
         return;
     unsigned bytecodeOffset = 0;

@@ -714,7 +714,7 @@
 #if PLATFORM(WX)
 #if !CPU(PPC)
 #define ENABLE_ASSEMBLER 1
-#define ENABLE_JIT 1
+#define ENABLE_JIT 0
 #endif
 #define ENABLE_GLOBAL_FASTMALLOC_NEW 0
 #if OS(DARWIN)
@@ -1022,7 +1022,7 @@
     && (CPU(X86) || CPU(X86_64) || CPU(ARM) || CPU(MIPS)) \
     && (OS(DARWIN) || !COMPILER(GCC) || GCC_VERSION_AT_LEAST(4, 1, 0)) \
     && !OS(WINCE)
-#define ENABLE_JIT 1
+#define ENABLE_JIT 0
 #endif
 
 /* Currently only implemented for JSVALUE64, only tested on PLATFORM(MAC) */
@@ -1041,7 +1041,7 @@
 #endif
 
 #if CPU(SH4) && PLATFORM(QT)
-#define ENABLE_JIT 1
+#define ENABLE_JIT 0
 #endif
 
 /* Configure the JIT */
@@ -1064,7 +1064,7 @@
 #define HAVE_COMPUTED_GOTO 1
 #endif
 #if HAVE(COMPUTED_GOTO) && ENABLE(INTERPRETER)
-#define ENABLE_COMPUTED_GOTO_INTERPRETER 1
+#define ENABLE_COMPUTED_GOTO_INTERPRETER 0//1
 #endif
 
 /* Regular Expression Tracing - Set to 1 to trace RegExp's in jsc.  Results dumped at exit */

@@ -116,7 +116,7 @@ namespace JSC {
 */
 
 #ifndef NDEBUG
-static bool s_dumpsGeneratedCode = false;
+static bool s_dumpsGeneratedCode = true;
 #endif
 
 void BytecodeGenerator::setDumpsGeneratedCode(bool dumpsGeneratedCode)
