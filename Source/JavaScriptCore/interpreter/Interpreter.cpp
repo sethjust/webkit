@@ -1577,8 +1577,19 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
            Copies register src to register dst.
         */
+		/*
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
+		*/
+		
+		// our code
+		
+        int dst = vPC[1].u.operand;
+		JSValue src = callFrame->r(vPC[2].u.operand).jsValue(); // pull result for labeling
+		
+		callFrame->uncheckedR(dst) = src;
+		
+		//back to original
         
         callFrame->uncheckedR(dst) = callFrame->r(src);
 
