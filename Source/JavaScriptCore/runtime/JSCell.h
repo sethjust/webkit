@@ -33,6 +33,8 @@
 #include "WriteBarrier.h"
 #include <wtf/Noncopyable.h>
 
+#include <string.h> //for string concat
+
 namespace JSC {
 
     class JSGlobalObject;

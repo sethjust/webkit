@@ -32,7 +32,7 @@ namespace JSC {
 	 */
 	
 	// Get labels value
-	long JSLabel::Val() {
+	long JSLabel::Val() const {
 		return *label;
 	}
 	

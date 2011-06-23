@@ -1577,21 +1577,20 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
            Copies register src to register dst.
         */
-		/*
+		
+		/* original code
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
+		
+		callFrame->uncheckedR(dst) = callFrame->r(src);
 		*/
 		
 		// our code
-		
         int dst = vPC[1].u.operand;
-		JSValue src = callFrame->r(vPC[2].u.operand).jsValue(); // pull result for labeling
+		JSValue src = callFrame->r(vPC[2].u.operand).jsValue(); // pull result out to JSValue for labeling
 		
 		callFrame->uncheckedR(dst) = src;
-		
 		//back to original
-        
-        //callFrame->uncheckedR(dst) = callFrame->r(src);
 
         vPC += OPCODE_LENGTH(op_mov);
         NEXT_INSTRUCTION();
@@ -3019,7 +3018,7 @@ skip_id_custom_self:
     skip_get_array_length:
     goto *(&&skip_get_string_length);
 #endif
-    DEFINE_OPCODE(op_get_string_length) {
+    DEFINE_OPCODE(op_get_string_length) { //instrument - context
         /* op_get_string_length dst(r) base(r) property(id) nop(sID) nop(n) nop(n) nop(n)
 
            Cached property access: Gets the length of the string in register base,
@@ -3043,7 +3042,7 @@ skip_id_custom_self:
     skip_get_string_length:
     goto *(&&skip_put_by_id);
 #endif
-    DEFINE_OPCODE(op_put_by_id) {
+    DEFINE_OPCODE(op_put_by_id) { //instrument - context
         /* put_by_id base(r) property(id) value(r) nop(n) nop(n) nop(n) nop(n) direct(b)
 
            Generic property access: Sets the property named by identifier
@@ -3079,7 +3078,7 @@ skip_id_custom_self:
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
       skip_put_by_id:
 #endif
-    DEFINE_OPCODE(op_put_by_id_transition) {
+    DEFINE_OPCODE(op_put_by_id_transition) { //instrument - context
         /* op_put_by_id_transition base(r) property(id) value(r) oldStructure(sID) newStructure(sID) structureChain(chain) offset(n) direct(b)
          
            Cached property access: Attempts to set a new property with a cached transition
@@ -3131,7 +3130,7 @@ skip_id_custom_self:
         uncachePutByID(codeBlock, vPC);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_by_id_replace) {
+    DEFINE_OPCODE(op_put_by_id_replace) { //instrument - context
         /* op_put_by_id_replace base(r) property(id) value(r) structure(sID) offset(n) nop(n) nop(n) direct(b)
 
            Cached property access: Attempts to set a pre-existing, cached
@@ -3166,7 +3165,7 @@ skip_id_custom_self:
         uncachePutByID(codeBlock, vPC);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_by_id_generic) {
+    DEFINE_OPCODE(op_put_by_id_generic) { //instrument - context
         /* op_put_by_id_generic base(r) property(id) value(r) nop(n) nop(n) nop(n) nop(n) direct(b)
 
            Generic property access: Sets the property named by identifier
@@ -3193,7 +3192,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_put_by_id_generic);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_del_by_id) {
+    DEFINE_OPCODE(op_del_by_id) { //instrument - context
         /* del_by_id dst(r) base(r) property(id)
 
            Converts register base to Object, deletes the property
@@ -3286,7 +3285,7 @@ skip_id_custom_self:
         }
         // fallthrough
     }
-    DEFINE_OPCODE(op_get_by_val) {
+    DEFINE_OPCODE(op_get_by_val) { //instrument - context
         /* get_by_val dst(r) base(r) property(r)
 
            Converts register base to Object, gets the property named
@@ -3327,7 +3326,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_get_by_val);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_by_val) {
+    DEFINE_OPCODE(op_put_by_val) { //instrument - context
         /* put_by_val base(r) property(r) value(r)
 
            Sets register value on register base as the property named
@@ -3377,7 +3376,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_put_by_val);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_del_by_val) {
+    DEFINE_OPCODE(op_del_by_val) { //instrument - context
         /* del_by_val dst(r) base(r) property(r)
 
            Converts register base to Object, deletes the property
@@ -3411,7 +3410,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_del_by_val);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_by_index) {
+    DEFINE_OPCODE(op_put_by_index) { //instrument - ?
         /* put_by_index base(r) property(n) value(r)
 
            Sets register value on register base as the property named
@@ -3799,7 +3798,7 @@ skip_id_custom_self:
             vPC += codeBlock->stringSwitchJumpTable(tableIndex).offsetForValue(asString(scrutinee)->value(callFrame).impl(), defaultOffset);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_new_func) {
+    DEFINE_OPCODE(op_new_func) { //instrument - context
         /* new_func dst(r) func(f)
 
            Constructs a new Function instance from function func and
@@ -3817,7 +3816,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_new_func);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_new_func_exp) {
+    DEFINE_OPCODE(op_new_func_exp) { //instrument - context
         /* new_func_exp dst(r) func(f)
 
            Constructs a new Function instance from function func and
@@ -3849,7 +3848,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_new_func_exp);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_call_eval) {
+    DEFINE_OPCODE(op_call_eval) { //instrument - whatever we choose to do with eval
         /* call_eval func(r) argCount(n) registerOffset(n)
 
            Call a function named "eval" with no explicit "this" value
@@ -3887,7 +3886,7 @@ skip_id_custom_self:
         // instruction as a normal function call.
         // fall through to op_call
     }
-    DEFINE_OPCODE(op_call) {
+    DEFINE_OPCODE(op_call) { //instrument - push to PC
         /* call func(r) argCount(n) registerOffset(n)
 
            Perform a function call.
@@ -3965,7 +3964,7 @@ skip_id_custom_self:
         exceptionValue = createNotAFunctionError(callFrame, v);
         goto vm_throw;
     }
-    DEFINE_OPCODE(op_load_varargs) {
+    DEFINE_OPCODE(op_load_varargs) { //instrument - !!
         int argCountDst = vPC[1].u.operand;
         int argsOffset = vPC[2].u.operand;
         
@@ -4044,7 +4043,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_load_varargs);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_call_varargs) {
+    DEFINE_OPCODE(op_call_varargs) { //instrument - OH DEAR BABY JESUS
         /* call_varargs func(r) argCountReg(r) baseRegisterOffset(n)
          
          Perform a function call with a dynamic set of arguments.
@@ -4123,7 +4122,7 @@ skip_id_custom_self:
         exceptionValue = createNotAFunctionError(callFrame, v);
         goto vm_throw;
     }
-    DEFINE_OPCODE(op_tear_off_activation) {
+    DEFINE_OPCODE(op_tear_off_activation) { //instrument - context
         /* tear_off_activation activation(r) arguments(r)
 
            Copy locals and named parameters from the register file to the heap.
@@ -4153,7 +4152,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_tear_off_activation);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_tear_off_arguments) {
+    DEFINE_OPCODE(op_tear_off_arguments) { //instrument - context
         /* tear_off_arguments arguments(r)
 
            Copy named parameters from the register file to the heap. Point the
@@ -4174,7 +4173,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_tear_off_arguments);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_ret) {
+    DEFINE_OPCODE(op_ret) { //instrument - context
         /* ret result(r)
            
            Return register result as the return value of the current
@@ -4200,7 +4199,7 @@ skip_id_custom_self:
 
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_call_put_result) {
+    DEFINE_OPCODE(op_call_put_result) { //instrument - context
         /* op_call_put_result result(r)
            
            Move call result from functionReturnValue to caller's
@@ -4212,7 +4211,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_call_put_result);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_ret_object_or_this) {
+    DEFINE_OPCODE(op_ret_object_or_this) {  //instrument - context
         /* ret result(r)
            
            Return register result as the return value of the current
@@ -4257,7 +4256,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_enter);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_create_activation) {
+    DEFINE_OPCODE(op_create_activation) { //instrument - context
         /* create_activation dst(r)
 
            If the activation object for this callframe has not yet been created,
@@ -4273,7 +4272,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_create_activation);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_callee) {
+    DEFINE_OPCODE(op_get_callee) { //instrument - context
         /* op_get_callee callee(r)
 
            Move callee into a register.
@@ -4284,7 +4283,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_get_callee);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_create_this) {
+    DEFINE_OPCODE(op_create_this) { //instrument - context
         /* op_create_this this(r) proto(r)
 
            Allocate an object as 'this', fr use in construction.
@@ -4313,7 +4312,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_create_this);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_convert_this) {
+    DEFINE_OPCODE(op_convert_this) { //instrument - label new val
         /* convert_this this(r)
 
            Takes the value in the 'this' register, converts it to a
@@ -4333,7 +4332,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_convert_this);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_convert_this_strict) {
+    DEFINE_OPCODE(op_convert_this_strict) { //instrument - label new val
         /* convert_this_strict this(r)
          
          Takes the value in the 'this' register, and converts it to
@@ -4352,7 +4351,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_convert_this_strict);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_init_lazy_reg) {
+    DEFINE_OPCODE(op_init_lazy_reg) { //instrument - give new value PC label
         /* init_lazy_reg dst(r)
 
            Initialises dst(r) to JSValue().
@@ -4365,7 +4364,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_init_lazy_reg);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_create_arguments) {
+    DEFINE_OPCODE(op_create_arguments) { //instrument?
         /* create_arguments dst(r)
 
            Creates the 'arguments' object and places it in both the
@@ -4383,7 +4382,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_create_arguments);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_construct) {
+    DEFINE_OPCODE(op_construct) { //instrument - label new object
         /* construct func(r) argCount(n) registerOffset(n) proto(r) thisRegister(r)
 
            Invoke register "func" as a constructor. For JS
@@ -4461,7 +4460,7 @@ skip_id_custom_self:
         exceptionValue = createNotAConstructorError(callFrame, v);
         goto vm_throw;
     }
-    DEFINE_OPCODE(op_strcat) {
+    DEFINE_OPCODE(op_strcat) { //instrument - label new string as join of those used
         /* strcat dst(r) src(r) count(n)
 
            Construct a new String instance using the original
@@ -4480,7 +4479,7 @@ skip_id_custom_self:
 
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_to_primitive) {
+    DEFINE_OPCODE(op_to_primitive) { //instrument - this moves data, so we need to invoke the PC
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
 
@@ -4666,7 +4665,7 @@ skip_id_custom_self:
         exceptionValue = JSValue(createReferenceError(callFrame, message));
         goto vm_throw;
     }
-    DEFINE_OPCODE(op_end) {
+    DEFINE_OPCODE(op_end) { //instrument - pop the stack (?)
         /* end result(r)
            
            Return register result as the value of a global or eval

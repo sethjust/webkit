@@ -17,7 +17,7 @@ namespace JSC {
 	public:
 		JSLabel(); // constructor
 		JSLabel(long); // overload
-		long Val(); // return label value
+		long Val() const; // return label value
 		//~JSLabel(); // Deconstructor
 		JSLabel Join(JSLabel l); // join labels
 	};
