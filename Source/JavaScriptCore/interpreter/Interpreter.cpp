@@ -1525,7 +1525,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
     switch (vPC->u.opcode)
 #endif
     {
-    DEFINE_OPCODE(op_new_object) {
+    DEFINE_OPCODE(op_new_object) { //instrument
         /* new_object dst(r)
 
            Constructs a new empty Object instance using the original
@@ -1537,7 +1537,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_new_object);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_new_array) {
+    DEFINE_OPCODE(op_new_array) { //instrument
         /* new_array dst(r) firstArg(r) argCount(n)
 
            Constructs a new Array instance using the original
@@ -1554,7 +1554,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_new_array);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_new_regexp) {
+    DEFINE_OPCODE(op_new_regexp) { //instrument - who created it?
         /* new_regexp dst(r) regExp(re)
 
            Constructs a new RegExp instance using the original
@@ -1572,7 +1572,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_new_regexp);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_mov) {
+    DEFINE_OPCODE(op_mov) {  //instrument - finish
         /* mov dst(r) src(r)
 
            Copies register src to register dst.
@@ -1595,7 +1595,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_mov);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_eq) {
+    DEFINE_OPCODE(op_eq) { //instrument - bool
         /* eq dst(r) src1(r) src2(r)
 
            Checks whether register src1 and register src2 are equal,
@@ -1617,7 +1617,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_eq);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_eq_null) {
+    DEFINE_OPCODE(op_eq_null) { //instrument - bool
         /* eq_null dst(r) src(r)
 
            Checks whether register src is null, as with the ECMAScript '!='
@@ -1636,7 +1636,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_eq_null);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_neq) {
+    DEFINE_OPCODE(op_neq) {  //instrument - bool
         /* neq dst(r) src1(r) src2(r)
 
            Checks whether register src1 and register src2 are not
@@ -1657,7 +1657,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_neq);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_neq_null) {
+    DEFINE_OPCODE(op_neq_null) {  //instrument - bool
         /* neq_null dst(r) src(r)
 
            Checks whether register src is not null, as with the ECMAScript '!='
@@ -1676,7 +1676,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_neq_null);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_stricteq) {
+    DEFINE_OPCODE(op_stricteq) { //instrument - bool
         /* stricteq dst(r) src1(r) src2(r)
 
            Checks whether register src1 and register src2 are strictly
@@ -1693,7 +1693,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_stricteq);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_nstricteq) {
+    DEFINE_OPCODE(op_nstricteq) { //instrument - bool
         /* nstricteq dst(r) src1(r) src2(r)
 
            Checks whether register src1 and register src2 are not
@@ -1710,7 +1710,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_nstricteq);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_less) {
+    DEFINE_OPCODE(op_less) { //instrument - bool
         /* less dst(r) src1(r) src2(r)
 
            Checks whether register src1 is less than register src2, as
@@ -1727,7 +1727,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_less);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_lesseq) {
+    DEFINE_OPCODE(op_lesseq) { //instrument - bool
         /* lesseq dst(r) src1(r) src2(r)
 
            Checks whether register src1 is less than or equal to
@@ -1744,7 +1744,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_lesseq);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_pre_inc) {
+    DEFINE_OPCODE(op_pre_inc) { //instrument - adjusted value
         /* pre_inc srcDst(r)
 
            Converts register srcDst to number, adds one, and puts the result
@@ -1763,7 +1763,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_pre_inc);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_pre_dec) {
+    DEFINE_OPCODE(op_pre_dec) { //instrument - adjusted value
         /* pre_dec srcDst(r)
 
            Converts register srcDst to number, subtracts one, and puts the result
@@ -1782,7 +1782,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_pre_dec);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_post_inc) {
+    DEFINE_OPCODE(op_post_inc) { //instrument - both outs
         /* post_inc dst(r) srcDst(r)
 
            Converts register srcDst to number. The number itself is
@@ -1805,7 +1805,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_post_inc);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_post_dec) {
+    DEFINE_OPCODE(op_post_dec) { //instrument - both outs
         /* post_dec dst(r) srcDst(r)
 
            Converts register srcDst to number. The number itself is
@@ -1828,7 +1828,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_post_dec);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_to_jsnumber) {
+    DEFINE_OPCODE(op_to_jsnumber) { //instrument - result
         /* to_jsnumber dst(r) src(r)
 
            Converts register src to number, and puts the result
@@ -1850,7 +1850,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_to_jsnumber);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_negate) {
+    DEFINE_OPCODE(op_negate) { //instrument - context
         /* negate dst(r) src(r)
 
            Converts register src to number, negates it, and puts the
@@ -1869,7 +1869,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_negate);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_add) {
+    DEFINE_OPCODE(op_add) { //instrument - context
         /* add dst(r) src1(r) src2(r)
 
            Adds register src1 and register src2, and puts the result
@@ -1889,7 +1889,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_add);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_mul) {
+    DEFINE_OPCODE(op_mul) { //instrument - join
         /* mul dst(r) src1(r) src2(r)
 
            Multiplies register src1 and register src2 (converted to
@@ -1909,7 +1909,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_mul);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_div) {
+    DEFINE_OPCODE(op_div) { //instrument - join
         /* div dst(r) dividend(r) divisor(r)
 
            Divides register dividend (converted to number) by the
@@ -1927,7 +1927,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_div);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_mod) {
+    DEFINE_OPCODE(op_mod) { //instrument - join
         /* mod dst(r) dividend(r) divisor(r)
 
            Divides register dividend (converted to number) by
@@ -1956,7 +1956,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_mod);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_sub) {
+    DEFINE_OPCODE(op_sub) { //instrument - join
         /* sub dst(r) src1(r) src2(r)
 
            Subtracts register src2 (converted to number) from register
@@ -1976,7 +1976,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_sub);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_lshift) {
+    DEFINE_OPCODE(op_lshift) { //instrument - context
         /* lshift dst(r) val(r) shift(r)
 
            Performs left shift of register val (converted to int32) by
@@ -1998,7 +1998,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_lshift);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_rshift) {
+    DEFINE_OPCODE(op_rshift) { //instrument - context
         /* rshift dst(r) val(r) shift(r)
 
            Performs arithmetic right shift of register val (converted
@@ -2020,7 +2020,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_rshift);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_urshift) {
+    DEFINE_OPCODE(op_urshift) { //instrument - context
         /* rshift dst(r) val(r) shift(r)
 
            Performs logical right shift of register val (converted
@@ -2041,7 +2041,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_urshift);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_bitand) {
+    DEFINE_OPCODE(op_bitand) { //instrument - join
         /* bitand dst(r) src1(r) src2(r)
 
            Computes bitwise AND of register src1 (converted to int32)
@@ -2062,7 +2062,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_bitand);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_bitxor) {
+    DEFINE_OPCODE(op_bitxor) { //instrument - join
         /* bitxor dst(r) src1(r) src2(r)
 
            Computes bitwise XOR of register src1 (converted to int32)
@@ -2083,7 +2083,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_bitxor);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_bitor) {
+    DEFINE_OPCODE(op_bitor) { //instrument - join
         /* bitor dst(r) src1(r) src2(r)
 
            Computes bitwise OR of register src1 (converted to int32)
@@ -2104,7 +2104,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_bitor);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_bitnot) {
+    DEFINE_OPCODE(op_bitnot) { //instrument - join
         /* bitnot dst(r) src(r)
 
            Computes bitwise NOT of register src1 (converted to int32),
@@ -2122,7 +2122,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_bitnot);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_not) {
+    DEFINE_OPCODE(op_not) { //instrument - bool
         /* not dst(r) src(r)
 
            Computes logical NOT of register src (converted to
@@ -2137,7 +2137,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_not);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_check_has_instance) {
+    DEFINE_OPCODE(op_check_has_instance) { //instrument - output
         /* check_has_instance constructor(r)
 
            Check 'constructor' is an object with the internal property
@@ -2154,7 +2154,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_check_has_instance);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_instanceof) {
+    DEFINE_OPCODE(op_instanceof) { //instrument - bool
         /* instanceof dst(r) value(r) constructor(r) constructorProto(r)
 
            Tests whether register value is an instance of register
@@ -2183,7 +2183,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_instanceof);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_typeof) {
+    DEFINE_OPCODE(op_typeof) { //instrument - context
         /* typeof dst(r) src(r)
 
            Determines the type string for src according to ECMAScript
@@ -2196,7 +2196,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_typeof);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_is_undefined) {
+    DEFINE_OPCODE(op_is_undefined) { //instrument - bool
         /* is_undefined dst(r) src(r)
 
            Determines whether the type string for src according to
@@ -2211,7 +2211,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_is_undefined);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_is_boolean) {
+    DEFINE_OPCODE(op_is_boolean) { //instrument - context
         /* is_boolean dst(r) src(r)
 
            Determines whether the type string for src according to
@@ -2225,7 +2225,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_is_boolean);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_is_number) {
+    DEFINE_OPCODE(op_is_number) { //instrument - bool
         /* is_number dst(r) src(r)
 
            Determines whether the type string for src according to
@@ -2239,7 +2239,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_is_number);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_is_string) {
+    DEFINE_OPCODE(op_is_string) { //instrument - bool
         /* is_string dst(r) src(r)
 
            Determines whether the type string for src according to
@@ -2253,7 +2253,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_is_string);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_is_object) {
+    DEFINE_OPCODE(op_is_object) { //instrument - bool
         /* is_object dst(r) src(r)
 
            Determines whether the type string for src according to
@@ -2267,7 +2267,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_is_object);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_is_function) {
+    DEFINE_OPCODE(op_is_function) { //instrument - bool
         /* is_function dst(r) src(r)
 
            Determines whether the type string for src according to
@@ -2281,7 +2281,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_is_function);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_in) {
+    DEFINE_OPCODE(op_in) { //instrument - bool
         /* in dst(r) property(r) base(r)
 
            Tests whether register base has a property named register
@@ -2314,7 +2314,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_in);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve) {
+    DEFINE_OPCODE(op_resolve) { //instrument - join
         /* resolve dst(r) property(id)
 
            Looks up the property named by identifier property in the
@@ -2327,7 +2327,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_resolve);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_skip) {
+    DEFINE_OPCODE(op_resolve_skip) { //instrument - join
         /* resolve_skip dst(r) property(id) skip(n)
 
          Looks up the property named by identifier property in the
@@ -2341,7 +2341,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_global) {
+    DEFINE_OPCODE(op_resolve_global) { //instrument - join
         /* resolve_skip dst(r) globalObject(c) property(id) structure(sID) offset(n)
          
            Performs a dynamic property lookup for the given property, on the provided
@@ -2356,7 +2356,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_global_dynamic) {
+    DEFINE_OPCODE(op_resolve_global_dynamic) { //instrument - join
         /* resolve_skip dst(r) globalObject(c) property(id) structure(sID) offset(n), depth(n)
          
          Performs a dynamic property lookup for the given property, on the provided
@@ -2374,7 +2374,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_global_var) {
+    DEFINE_OPCODE(op_get_global_var) { //instrument - context
         /* get_global_var dst(r) globalObject(c) index(n)
 
            Gets the global var at global slot index and places it in register dst.
@@ -2388,7 +2388,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_get_global_var);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_global_var) {
+    DEFINE_OPCODE(op_put_global_var) { //instrument - context
         /* put_global_var globalObject(c) index(n) value(r)
          
            Puts value into global slot index.
@@ -2402,7 +2402,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_put_global_var);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_scoped_var) {
+    DEFINE_OPCODE(op_get_scoped_var) { //instrument - context
         /* get_scoped_var dst(r) index(n) skip(n)
 
          Loads the contents of the index-th local from the scope skip nodes from
@@ -2434,7 +2434,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_get_scoped_var);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_scoped_var) {
+    DEFINE_OPCODE(op_put_scoped_var) { //instrument - context
         /* put_scoped_var index(n) skip(n) value(r)
 
          */
@@ -2465,7 +2465,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_put_scoped_var);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_base) {
+    DEFINE_OPCODE(op_resolve_base) { //instrument - context
         /* resolve_base dst(r) property(id) isStrict(bool)
 
            Searches the scope chain for an object containing
@@ -2480,7 +2480,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_resolve_base);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_ensure_property_exists) {
+    DEFINE_OPCODE(op_ensure_property_exists) { //instrument - context
         /* ensure_property_exists base(r) property(id)
 
            Throws an exception if property does not exist on base
@@ -2500,7 +2500,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_ensure_property_exists);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_with_base) {
+    DEFINE_OPCODE(op_resolve_with_base) { //instrument - context
         /* resolve_with_base baseDst(r) propDst(r) property(id)
 
            Searches the scope chain for an object containing
@@ -2518,7 +2518,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_resolve_with_base);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_by_id) {
+    DEFINE_OPCODE(op_get_by_id) { //instrument - context
         /* get_by_id dst(r) base(r) property(id) structure(sID) nop(n) nop(n) nop(n)
 
            Generic property access: Gets the property named by identifier
@@ -2540,7 +2540,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_get_by_id);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_by_id_self) {
+    DEFINE_OPCODE(op_get_by_id_self) { //instrument - context
         /* op_get_by_id_self dst(r) base(r) property(id) structure(sID) offset(n) nop(n) nop(n)
 
            Cached property access: Attempts to get a cached property from the
@@ -2571,7 +2571,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         uncacheGetByID(codeBlock, vPC);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_by_id_proto) {
+    DEFINE_OPCODE(op_get_by_id_proto) { //instrument - context
         /* op_get_by_id_proto dst(r) base(r) property(id) structure(sID) prototypeStructure(sID) offset(n) nop(n)
 
            Cached property access: Attempts to get a cached property from the
@@ -2610,7 +2610,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_getter_proto);
 #endif
-    DEFINE_OPCODE(op_get_by_id_getter_proto) {
+    DEFINE_OPCODE(op_get_by_id_getter_proto) { //instrument - context
         /* op_get_by_id_getter_proto dst(r) base(r) property(id) structure(sID) prototypeStructure(sID) offset(n) nop(n)
          
          Cached property access: Attempts to get a cached getter property from the
@@ -2655,7 +2655,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_custom_proto);
 #endif
-    DEFINE_OPCODE(op_get_by_id_custom_proto) {
+    DEFINE_OPCODE(op_get_by_id_custom_proto) { //instrument - context
         /* op_get_by_id_custom_proto dst(r) base(r) property(id) structure(sID) prototypeStructure(sID) offset(n) nop(n)
          
          Cached property access: Attempts to use a cached named property getter
@@ -2739,7 +2739,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_get_by_id_chain);
 #endif
-    DEFINE_OPCODE(op_get_by_id_chain) {
+    DEFINE_OPCODE(op_get_by_id_chain) { //instrument - context
         /* op_get_by_id_chain dst(r) base(r) property(id) structure(sID) structureChain(chain) count(n) offset(n)
 
            Cached property access: Attempts to get a cached property from the
@@ -2789,7 +2789,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
     skip_get_by_id_chain:
     goto *(&&skip_id_getter_self);
 #endif
-    DEFINE_OPCODE(op_get_by_id_getter_self) {
+    DEFINE_OPCODE(op_get_by_id_getter_self) { //instrument - context
         /* op_get_by_id_self dst(r) base(r) property(id) structure(sID) offset(n) nop(n) nop(n)
          
          Cached property access: Attempts to get a cached property from the
@@ -2832,7 +2832,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_custom_self);
 #endif
-    DEFINE_OPCODE(op_get_by_id_custom_self) {
+    DEFINE_OPCODE(op_get_by_id_custom_self) { //instrument - context
         /* op_get_by_id_custom_self dst(r) base(r) property(id) structure(sID) offset(n) nop(n) nop(n)
          
          Cached property access: Attempts to use a cached named property getter
@@ -2866,7 +2866,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
 skip_id_custom_self:
 #endif
-    DEFINE_OPCODE(op_get_by_id_generic) {
+    DEFINE_OPCODE(op_get_by_id_generic) { //instrument - context
         /* op_get_by_id_generic dst(r) base(r) property(id) nop(sID) nop(n) nop(n) nop(n)
 
            Generic property access: Gets the property named by identifier
@@ -2889,7 +2889,7 @@ skip_id_custom_self:
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_getter_chain);
 #endif
-    DEFINE_OPCODE(op_get_by_id_getter_chain) {
+    DEFINE_OPCODE(op_get_by_id_getter_chain) { //instrument - context
         /* op_get_by_id_getter_chain dst(r) base(r) property(id) structure(sID) structureChain(chain) count(n) offset(n)
          
          Cached property access: Attempts to get a cached property from the
@@ -2944,7 +2944,7 @@ skip_id_custom_self:
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_custom_chain);
 #endif
-    DEFINE_OPCODE(op_get_by_id_custom_chain) {
+    DEFINE_OPCODE(op_get_by_id_custom_chain) { //instrument - context
         /* op_get_by_id_custom_chain dst(r) base(r) property(id) structure(sID) structureChain(chain) count(n) offset(n)
          
          Cached property access: Attempts to use a cached named property getter on the
@@ -2994,7 +2994,7 @@ skip_id_custom_self:
     skip_id_custom_chain:
     goto *(&&skip_get_array_length);
 #endif
-    DEFINE_OPCODE(op_get_array_length) {
+    DEFINE_OPCODE(op_get_array_length) { //instrument - context
         /* op_get_array_length dst(r) base(r) property(id) nop(sID) nop(n) nop(n) nop(n)
 
            Cached property access: Gets the length of the array in register base,
