@@ -608,6 +608,9 @@
 		E49DC16D12EF295300184A1F /* SourceProviderCacheItem.h in Headers */ = {isa = PBXBuildFile; fileRef = E49DC14912EF261A00184A1F /* SourceProviderCacheItem.h */; };
 		E4D8CEFB12FC439600BC9F5A /* BloomFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D8CE9B12FC42E100BC9F5A /* BloomFilter.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		F3BD31ED126735770065467F /* TextPosition.h in Headers */ = {isa = PBXBuildFile; fileRef = F3BD31D0126730180065467F /* TextPosition.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		F9E93A0F13B3B3450070D745 /* JSLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9E93A0D13B3B3450070D745 /* JSLabel.cpp */; };
+		F9E93A1013B3B3450070D745 /* JSLabel.h in Headers */ = {isa = PBXBuildFile; fileRef = F9E93A0E13B3B3450070D745 /* JSLabel.h */; };
+		F9E93A2213B3B6650070D745 /* JSLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9E93A0D13B3B3450070D745 /* JSLabel.cpp */; };
 		FDA15C1E12B0305C003A583A /* Complex.h in Headers */ = {isa = PBXBuildFile; fileRef = FDA15C1612B03028003A583A /* Complex.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FE1B447A0ECCD73B004F4DD1 /* StdLibExtras.h in Headers */ = {isa = PBXBuildFile; fileRef = FE1B44790ECCD73B004F4DD1 /* StdLibExtras.h */; settings = {ATTRIBUTES = (Private, ); }; };
 /* End PBXBuildFile section */
@@ -1312,6 +1315,8 @@
 		F692A8850255597D01FF60F7 /* UString.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UString.cpp; sourceTree = "<group>"; tabWidth = 8; };
 		F692A8860255597D01FF60F7 /* UString.h */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = UString.h; sourceTree = "<group>"; tabWidth = 8; };
 		F692A8870255597D01FF60F7 /* JSValue.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSValue.cpp; sourceTree = "<group>"; tabWidth = 8; };
+		F9E93A0D13B3B3450070D745 /* JSLabel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSLabel.cpp; sourceTree = "<group>"; };
+		F9E93A0E13B3B3450070D745 /* JSLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSLabel.h; sourceTree = "<group>"; };
 		FDA15C1612B03028003A583A /* Complex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Complex.h; sourceTree = "<group>"; };
 		FE1B44790ECCD73B004F4DD1 /* StdLibExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StdLibExtras.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1382,6 +1387,7 @@
 		0867D691FE84028FC02AAC07 /* JavaScriptCore */ = {
 			isa = PBXGroup;
 			children = (
+				F9E93A0C13B3B3450070D745 /* label */,
 				A718F8211178EB4B002465A7 /* create_regex_tables */,
 				937B63CC09E766D200A671DD /* DerivedSources.make */,
 				A7C225CC139981F100FF1662 /* KeywordLookupGenerator.py */,
@@ -2190,6 +2196,15 @@
 			path = icu;
 			sourceTree = "<group>";
 		};
+		F9E93A0C13B3B3450070D745 /* label */ = {
+			isa = PBXGroup;
+			children = (
+				F9E93A0D13B3B3450070D745 /* JSLabel.cpp */,
+				F9E93A0E13B3B3450070D745 /* JSLabel.h */,
+			);
+			path = label;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2566,6 +2581,7 @@
 				141448CB13A176EC00F5BA1A /* MarkedBlockSet.h in Headers */,
 				141448CD13A1783700F5BA1A /* TinyBloomFilter.h in Headers */,
 				142A1D8413A19C84009DA5FE /* OldSpace.h in Headers */,
+				F9E93A1013B3B3450070D745 /* JSLabel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3014,6 +3030,7 @@
 				86BB09C0138E381B0056702F /* DFGRepatch.cpp in Sources */,
 				14D2F3DA139F4BE200491031 /* NewSpace.cpp in Sources */,
 				142A1D8313A19C84009DA5FE /* OldSpace.cpp in Sources */,
+				F9E93A0F13B3B3450070D745 /* JSLabel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3022,6 +3039,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				932F5BDD0822A1C700736975 /* jsc.cpp in Sources */,
+				F9E93A2213B3B6650070D745 /* JSLabel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

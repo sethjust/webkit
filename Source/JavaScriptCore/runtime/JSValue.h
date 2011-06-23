@@ -32,6 +32,8 @@
 #include <wtf/MathExtras.h>
 #include <wtf/StdLibExtras.h>
 
+#include "JSLabel.h" // Include JSLabel code
+
 namespace JSC {
 
     class ExecState;
@@ -100,6 +102,8 @@ namespace JSC {
         friend class SpecializedThunkJIT;
 
     public:
+		JSLabel label; // Added JSLabel attribute for info flow tracking
+		
         static EncodedJSValue encode(JSValue);
         static JSValue decode(EncodedJSValue);
 
