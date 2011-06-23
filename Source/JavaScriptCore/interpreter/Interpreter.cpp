@@ -1591,7 +1591,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 		
 		//back to original
         
-        callFrame->uncheckedR(dst) = callFrame->r(src);
+        //callFrame->uncheckedR(dst) = callFrame->r(src);
 
         vPC += OPCODE_LENGTH(op_mov);
         NEXT_INSTRUCTION();
