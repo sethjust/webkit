@@ -589,6 +589,12 @@
 		BCFD8C920EEB2EE700283848 /* JumpTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BCFD8C900EEB2EE700283848 /* JumpTable.cpp */; };
 		BCFD8C930EEB2EE700283848 /* JumpTable.h in Headers */ = {isa = PBXBuildFile; fileRef = BCFD8C910EEB2EE700283848 /* JumpTable.h */; };
 		C0A272630E50A06300E96E15 /* NotFound.h in Headers */ = {isa = PBXBuildFile; fileRef = C0A2723F0E509F1E00E96E15 /* NotFound.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		C21CDA3913B4E5DC000D5DAC /* Generator.h in Headers */ = {isa = PBXBuildFile; fileRef = C21CDA3713B4E5DC000D5DAC /* Generator.h */; };
+		C21CDA3A13B4E5DC000D5DAC /* Generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3813B4E5DC000D5DAC /* Generator.cpp */; };
+		C21CDA3D13B4EC35000D5DAC /* ProgramCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */; };
+		C21CDA3E13B4EC35000D5DAC /* ProgramCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */; };
+		C21CDA4913B5480C000D5DAC /* Generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3813B4E5DC000D5DAC /* Generator.cpp */; };
+		C21CDA4A13B54815000D5DAC /* ProgramCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */; };
 		D7A46A4F1338FFEA00ED695C /* DynamicAnnotations.h in Headers */ = {isa = PBXBuildFile; fileRef = D75AF59612F8CB9500FC0ADF /* DynamicAnnotations.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DD377CBC12072C18006A2517 /* Bitmap.h in Headers */ = {isa = PBXBuildFile; fileRef = DD377CBB12072C18006A2517 /* Bitmap.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DDF7ABD411F60ED200108E36 /* GCActivityCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = DDF7ABD211F60ED200108E36 /* GCActivityCallback.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -1248,6 +1254,10 @@
 		BCFD8C900EEB2EE700283848 /* JumpTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JumpTable.cpp; sourceTree = "<group>"; };
 		BCFD8C910EEB2EE700283848 /* JumpTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JumpTable.h; sourceTree = "<group>"; };
 		C0A2723F0E509F1E00E96E15 /* NotFound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotFound.h; sourceTree = "<group>"; };
+		C21CDA3713B4E5DC000D5DAC /* Generator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Generator.h; sourceTree = "<group>"; };
+		C21CDA3813B4E5DC000D5DAC /* Generator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Generator.cpp; sourceTree = "<group>"; };
+		C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramCounter.h; sourceTree = "<group>"; };
+		C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProgramCounter.cpp; sourceTree = "<group>"; };
 		D21202280AD4310C00ED79B6 /* DateConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = DateConversion.cpp; sourceTree = "<group>"; };
 		D21202290AD4310C00ED79B6 /* DateConversion.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = DateConversion.h; sourceTree = "<group>"; };
 		D75AF59512F8CB9500FC0ADF /* DynamicAnnotations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DynamicAnnotations.cpp; sourceTree = "<group>"; };
@@ -2201,6 +2211,10 @@
 			children = (
 				F9E93A0D13B3B3450070D745 /* JSLabel.cpp */,
 				F9E93A0E13B3B3450070D745 /* JSLabel.h */,
+				C21CDA3713B4E5DC000D5DAC /* Generator.h */,
+				C21CDA3813B4E5DC000D5DAC /* Generator.cpp */,
+				C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */,
+				C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */,
 			);
 			path = label;
 			sourceTree = "<group>";
@@ -2582,6 +2596,8 @@
 				141448CD13A1783700F5BA1A /* TinyBloomFilter.h in Headers */,
 				142A1D8413A19C84009DA5FE /* OldSpace.h in Headers */,
 				F9E93A1013B3B3450070D745 /* JSLabel.h in Headers */,
+				C21CDA3913B4E5DC000D5DAC /* Generator.h in Headers */,
+				C21CDA3D13B4EC35000D5DAC /* ProgramCounter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3031,6 +3047,8 @@
 				14D2F3DA139F4BE200491031 /* NewSpace.cpp in Sources */,
 				142A1D8313A19C84009DA5FE /* OldSpace.cpp in Sources */,
 				F9E93A0F13B3B3450070D745 /* JSLabel.cpp in Sources */,
+				C21CDA3A13B4E5DC000D5DAC /* Generator.cpp in Sources */,
+				C21CDA3E13B4EC35000D5DAC /* ProgramCounter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3040,6 +3058,8 @@
 			files = (
 				932F5BDD0822A1C700736975 /* jsc.cpp in Sources */,
 				F9E93A2213B3B6650070D745 /* JSLabel.cpp in Sources */,
+				C21CDA4913B5480C000D5DAC /* Generator.cpp in Sources */,
+				C21CDA4A13B54815000D5DAC /* ProgramCounter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
