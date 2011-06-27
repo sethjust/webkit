@@ -948,6 +948,13 @@ void CodeBlock::dump(ExecState* exec, const Vector<Instruction>::const_iterator&
             printf("[%4d] put_by_index\t %s, %u, %s\n", location, registerName(exec, r0).data(), n0, registerName(exec, r1).data());
             break;
         }
+			
+		// start our code
+		case op_joint: {
+			printf("[%4d] joint", location);
+		}
+		// end our code
+		
         case op_jmp: {
             int offset = (++it)->u.operand;
             printf("[%4d] jmp\t\t %d(->%d)\n", location, offset, location + offset);

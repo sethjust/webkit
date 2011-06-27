@@ -3448,7 +3448,17 @@ skip_id_custom_self:
         vPC += target;
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_jmp) {
+	
+	//start our code
+	DEFINE_OPCODE(op_joint) {
+		/* joint
+		 
+		 Dummy opcode to enable proper program counter behavior
+		 */
+	}
+	//end our code
+    
+	DEFINE_OPCODE(op_jmp) {
         /* jmp target(offset)
 
            Jumps unconditionally to offset target from the current
