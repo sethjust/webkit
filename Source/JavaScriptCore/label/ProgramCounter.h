@@ -21,7 +21,7 @@ namespace JSC {
 	public:
 		ProgramCounter(); // constructor
 		void Push(JSLabel); // push node to stack
-		JSLabel Pop(); // remove and return head
+		void Pop(); // remove and return head
 		JSLabel Head(); // return head
 	};
 }
