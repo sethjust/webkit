@@ -19,11 +19,9 @@ namespace JSC {
 		node = new PCNode(node, l);
 	}
 	
-	JSLabel ProgramCounter::Pop() {
+	void ProgramCounter::Pop() {
 		PCNode *temp = node;
 		node = temp->Next();
-		//delete &temp;
-		return temp->Val();
 	}
 	
 	JSLabel ProgramCounter::Head() {
