@@ -3453,8 +3453,10 @@ skip_id_custom_self:
 	DEFINE_OPCODE(op_joint) {
 		/* joint
 		 
-		 Dummy opcode to enable proper program counter behavior
-		 */
+		Dummy opcode to enable proper program counter behavior
+		*/
+		vPC += OPCODE_LENGTH(op_joint);
+		NEXT_INSTRUCTION();
 	}
 	//end our code
     
