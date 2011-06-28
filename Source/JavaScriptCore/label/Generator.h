@@ -14,7 +14,7 @@ namespace JSC {
 	
 	class Generator {
 	public:
-		Generator();
+		Generator(); // constructor
 	};
 }
 

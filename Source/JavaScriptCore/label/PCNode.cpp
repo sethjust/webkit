@@ -1,0 +1,27 @@
+/*
+ *  PCNode.cpp
+ *  JavaScriptCore
+ *
+ *  Created by Alan Cleary on 6/28/11.
+ *  Copyright 2011 Alan Cleary and Seth Just. All rights reserved.
+ *
+ */
+
+#include "PCNode.h"
+#include "config.h"
+
+namespace JSC {
+	
+	PCNode::PCNode(PCNode *n, JSLabel l) {
+		*node = *n;
+		value = l;
+	}
+	
+	JSLabel PCNode::Val() {
+		return value;
+	}
+	
+	PCNode* PCNode::Next() {
+		return node;
+	}
+}

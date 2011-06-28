@@ -7,21 +7,26 @@
  *
  */
 
-#include "config.h"
 #include "ProgramCounter.h"
-#include "JSValue.h"
 
 namespace JSC {
 	
-	ProgramCounter::ProgramCounter(ProgramCounter, JSValue) {
-		// tba
+	ProgramCounter::ProgramCounter() {
+		node = new PCNode(NULL, JSLabel());
 	}
 	
-	void ProgramCounter::Push(JSValue) {
-		// tba
+	void ProgramCounter::Push(JSLabel l) {
+		node = new PCNode(node, l);
 	}
 	
-	void ProgramCounter::Pop(JSValue) {
-		// tba
+	JSLabel ProgramCounter::Pop() {
+		PCNode *temp = node;
+		node = temp->Next();
+		//delete &temp;
+		return temp->Val();
+	}
+	
+	JSLabel ProgramCounter::Head() {
+		return node->Val();
 	}
 }

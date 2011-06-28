@@ -10,18 +10,19 @@
 #ifndef ProgramCounter_h
 #define ProgramCounter_h
 
-#include "JSValue.h"
+#include "config.h"
+#include "JSLabel.h"
+#include "PCNode.h"
 
 namespace JSC {
 	
 	class ProgramCounter {
-		ProgramCounter *node; // pointer to other conuters
-		JSValue value; // valuer of node
-		
+		PCNode *node; // current node
 	public:
-		ProgramCounter(ProgramCounter, JSValue); // constructor
-		void Push(JSValue);
-		void Pop(JSValue);
+		ProgramCounter(); // constructor
+		void Push(JSLabel); // push node to stack
+		JSLabel Pop(); // remove and return head
+		JSLabel Head(); // return head
 	};
 }
 
