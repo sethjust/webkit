@@ -24,13 +24,6 @@ namespace JSC {
 		*label = l;
 	}
 	
-	/*
-	 // Deconstruct JSLabel
-	 JSLabel::~JSLabel() {
-	 delete label;
-	 }
-	 */
-	
 	// Get labels value
 	long JSLabel::Val() const {
 		return *label;

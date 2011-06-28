@@ -18,7 +18,6 @@ namespace JSC {
 		JSLabel(); // constructor
 		JSLabel(long); // overload
 		long Val() const; // return label value
-		//~JSLabel(); // Deconstructor
 		JSLabel Join(JSLabel l); // join labels
 	};
 	
