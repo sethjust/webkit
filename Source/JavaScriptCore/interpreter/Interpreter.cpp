@@ -1532,7 +1532,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
            constructor, and puts the result in register dst.
         */
         int dst = vPC[1].u.operand;
-        callFrame->uncheckedR(dst) = JSValue(constructEmptyObject(callFrame));
+        
+		JSValue result = JSValue(constructEmptyObject(callFrame));
+		result.updateLabel(programCounter.Head());
+		callFrame->uncheckedR(dst) = result;
 
         vPC += OPCODE_LENGTH(op_new_object);
         NEXT_INSTRUCTION();
@@ -1549,7 +1552,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int firstArg = vPC[2].u.operand;
         int argCount = vPC[3].u.operand;
         ArgList args(callFrame->registers() + firstArg, argCount);
-        callFrame->uncheckedR(dst) = JSValue(constructArray(callFrame, args));
+
+		JSValue result = JSValue(constructArray(callFrame, args));
+		result.updateLabel(programCounter.Head());
+		callFrame->uncheckedR(dst) = result;
 
         vPC += OPCODE_LENGTH(op_new_array);
         NEXT_INSTRUCTION();
@@ -1567,8 +1573,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             exceptionValue = createSyntaxError(callFrame, "Invalid flags supplied to RegExp constructor.");
             goto vm_throw;
         }
-        callFrame->uncheckedR(dst) = JSValue(new (globalData) RegExpObject(callFrame->lexicalGlobalObject(), callFrame->scopeChain()->globalObject->regExpStructure(), regExp));
-
+		
+        JSValue result = JSValue(new (globalData) RegExpObject(callFrame->lexicalGlobalObject(), callFrame->scopeChain()->globalObject->regExpStructure(), regExp));
+		result.updateLabel(programCounter.Head());
+		callFrame->uncheckedR(dst) = result;
+		
         vPC += OPCODE_LENGTH(op_new_regexp);
         NEXT_INSTRUCTION();
     }
@@ -1588,6 +1597,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 		// our code
         int dst = vPC[1].u.operand;
 		JSValue src = callFrame->r(vPC[2].u.operand).jsValue(); // pull result out to JSValue for labeling
+		src.updateLabel(programCounter.Head());
 		
 		callFrame->uncheckedR(dst) = src;
 		//back to original
