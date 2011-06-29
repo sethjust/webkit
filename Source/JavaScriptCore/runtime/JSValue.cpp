@@ -37,6 +37,15 @@
 namespace JSC {
 
 static const double D32 = 4294967296.0;
+    
+// start our code
+void JSValue::updateLabel(JSValue other) {
+    label = label.Join(other.label);
+}
+void JSValue::updateLabel(JSLabel other) {
+    label = label.Join(other);
+}
+// end our code
 
 // ECMA 9.4
 double JSValue::toInteger(ExecState* exec) const

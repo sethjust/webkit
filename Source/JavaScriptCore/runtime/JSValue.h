@@ -103,6 +103,8 @@ namespace JSC {
 
     public:
 		JSLabel label; // Added JSLabel attribute for info flow tracking
+		void updateLabel(JSValue); // Convenience function for label updates
+		void updateLabel(JSLabel); // Convenience function for label updates
 		
         static EncodedJSValue encode(JSValue);
         static JSValue decode(EncodedJSValue);
