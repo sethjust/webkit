@@ -15,13 +15,15 @@
 namespace JSC {
 
 	class PCNode {
-		JSLabel value; // node value
 		PCNode *node; // pointer to previous node
+		JSLabel value; // node value
+		int loc;
 		
 	public:
-		PCNode(PCNode*, JSLabel); // constructor
-		JSLabel Val(); // return value
+		PCNode(PCNode*, JSLabel, int); // constructor
 		PCNode* Next(); // next node (for pop)
+		JSLabel Val(); // return value
+		int Loc(); 
 	};
 }
 

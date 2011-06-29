@@ -12,11 +12,11 @@
 namespace JSC {
 	
 	ProgramCounter::ProgramCounter() {
-		node = new PCNode(NULL, JSLabel());
+		node = new PCNode(NULL, JSLabel(), NULL);
 	}
 	
-	void ProgramCounter::Push(JSLabel l) {
-		node = new PCNode(node, l);
+	void ProgramCounter::Push(JSLabel l, int i) {
+		node = new PCNode(node, l, i);
 	}
 	
 	void ProgramCounter::Pop() {
@@ -26,5 +26,9 @@ namespace JSC {
 	
 	JSLabel ProgramCounter::Head() {
 		return node->Val();
+	}
+	
+	int ProgramCounter::Loc() {
+		return node->Loc();
 	}
 }

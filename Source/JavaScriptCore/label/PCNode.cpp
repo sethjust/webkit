@@ -12,13 +12,18 @@
 
 namespace JSC {
 	
-	PCNode::PCNode(PCNode *n, JSLabel l) {
+	PCNode::PCNode(PCNode *n, JSLabel l, int i) {
 		node = n;
 		value = l;
+		loc = i;
 	}
 	
 	JSLabel PCNode::Val() {
 		return value;
+	}
+	
+	int PCNode::Loc() {
+		return loc;
 	}
 	
 	PCNode* PCNode::Next() {
