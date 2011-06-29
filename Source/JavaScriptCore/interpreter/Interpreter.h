@@ -38,6 +38,10 @@
 
 #include <wtf/HashMap.h>
 
+// start our code
+#include "ProgramCounter.h"
+// end our code
+
 namespace JSC {
 
     class CodeBlock;
@@ -115,6 +119,10 @@ namespace JSC {
         void startSampling();
         void stopSampling();
     private:
+		// start our code
+		ProgramCounter programCounter;
+		// end our code
+		
         enum ExecutionFlag { Normal, InitializeAndReturn };
 
         CallFrameClosure prepareForRepeatCall(FunctionExecutable*, CallFrame*, JSFunction*, int argCount, ScopeChainNode*);

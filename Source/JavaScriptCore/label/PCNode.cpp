@@ -13,7 +13,7 @@
 namespace JSC {
 	
 	PCNode::PCNode(PCNode *n, JSLabel l) {
-		*node = *n;
+		node = n;
 		value = l;
 	}
 	
