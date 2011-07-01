@@ -20,10 +20,10 @@ namespace JSC {
 		PCNode *node; // current node
 	public:
 		ProgramCounter(); // constructor
-		void Push(JSLabel, int); // push node to stack
+		void Push(JSLabel, long); // push node to stack
 		void Pop(); // remove and return head
 		JSLabel Head(); // return head
-		int Loc();
+		long Loc();
 	};
 }
 

@@ -15,7 +15,7 @@ namespace JSC {
 		node = new PCNode(NULL, JSLabel(), NULL);
 	}
 	
-	void ProgramCounter::Push(JSLabel l, int i) {
+	void ProgramCounter::Push(JSLabel l, long i) {
 		node = new PCNode(node, l, i);
 	}
 	
@@ -28,7 +28,7 @@ namespace JSC {
 		return node->Val();
 	}
 	
-	int ProgramCounter::Loc() {
+	long ProgramCounter::Loc() {
 		return node->Loc();
 	}
 }

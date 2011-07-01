@@ -1615,12 +1615,16 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-        if (src1.isInt32() && src2.isInt32())
-            callFrame->uncheckedR(dst) = jsBoolean(src1.asInt32() == src2.asInt32());
-        else {
+        if (src1.isInt32() && src2.isInt32()) {
+            JSValue result = jsBoolean(src1.asInt32() == src2.asInt32());
+            result.label = src1.label.Join(src2.label);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsBoolean(JSValue::equalSlowCase(callFrame, src1, src2));
             CHECK_FOR_EXCEPTION();
-			//result.label = src1.label.join(src2.label);
+            result.label = src1.label.Join(src2.label);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -1637,12 +1641,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
 
         if (src.isUndefinedOrNull()) {
-            callFrame->uncheckedR(dst) = jsBoolean(true);
+            JSValue result = jsBoolean(true);
+            result.updateLabel(src);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
             vPC += OPCODE_LENGTH(op_eq_null);
             NEXT_INSTRUCTION();
         }
         
-        callFrame->uncheckedR(dst) = jsBoolean(src.isCell() && src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
+        JSValue result = jsBoolean(src.isCell() && src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
+        result.updateLabel(src);
+        result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
         vPC += OPCODE_LENGTH(op_eq_null);
         NEXT_INSTRUCTION();
     }
@@ -1656,11 +1666,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-        if (src1.isInt32() && src2.isInt32())
-            callFrame->uncheckedR(dst) = jsBoolean(src1.asInt32() != src2.asInt32());
-        else {
+        if (src1.isInt32() && src2.isInt32()) {
+            JSValue result = jsBoolean(src1.asInt32() != src2.asInt32());
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsBoolean(!JSValue::equalSlowCase(callFrame, src1, src2));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -1677,12 +1694,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
 
         if (src.isUndefinedOrNull()) {
-            callFrame->uncheckedR(dst) = jsBoolean(false);
+            JSValue result = jsBoolean(false);
+            result.updateLabel(src);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
             vPC += OPCODE_LENGTH(op_neq_null);
             NEXT_INSTRUCTION();
         }
         
-        callFrame->uncheckedR(dst) = jsBoolean(!src.isCell() || !src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
+        JSValue result = jsBoolean(!src.isCell() || !src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
+        result.updateLabel(src);
+        result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
         vPC += OPCODE_LENGTH(op_neq_null);
         NEXT_INSTRUCTION();
     }
@@ -1698,7 +1721,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         bool result = JSValue::strictEqual(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
-        callFrame->uncheckedR(dst) = jsBoolean(result);
+        JSValue res = jsBoolean(result);
+        res.updateLabel(src1);
+        res.updateLabel(src2);
+        res.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = res;
 
         vPC += OPCODE_LENGTH(op_stricteq);
         NEXT_INSTRUCTION();
@@ -1715,7 +1742,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         bool result = !JSValue::strictEqual(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
-        callFrame->uncheckedR(dst) = jsBoolean(result);
+        JSValue res = jsBoolean(result);
+        res.updateLabel(src1);
+        res.updateLabel(src2);
+        res.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = res;
 
         vPC += OPCODE_LENGTH(op_nstricteq);
         NEXT_INSTRUCTION();
@@ -1732,6 +1763,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         JSValue result = jsBoolean(jsLess(callFrame, src1, src2));
         CHECK_FOR_EXCEPTION();
+        result.updateLabel(src1);
+        result.updateLabel(src2);
+        result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
 
         vPC += OPCODE_LENGTH(op_less);
@@ -1749,6 +1783,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         JSValue result = jsBoolean(jsLessEq(callFrame, src1, src2));
         CHECK_FOR_EXCEPTION();
+        result.updateLabel(src1);
+        result.updateLabel(src2);
+        result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
 
         vPC += OPCODE_LENGTH(op_lesseq);
@@ -1767,6 +1804,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         else {
             JSValue result = jsNumber(v.toNumber(callFrame) + 1);
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(v);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(srcDst) = result;
         }
 
@@ -1786,6 +1825,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         else {
             JSValue result = jsNumber(v.toNumber(callFrame) - 1);
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(v);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(srcDst) = result;
         }
 
@@ -1803,12 +1844,23 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int srcDst = vPC[2].u.operand;
         JSValue v = callFrame->r(srcDst).jsValue();
         if (v.isInt32() && v.asInt32() < INT_MAX) {
-            callFrame->uncheckedR(srcDst) = jsNumber(v.asInt32() + 1);
+            JSValue result = jsNumber(v.asInt32() + 1);
+            result.updateLabel(v);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(srcDst) = result;
+
+            v.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = v;
         } else {
             JSValue number = callFrame->r(srcDst).jsValue().toJSNumber(callFrame);
             CHECK_FOR_EXCEPTION();
-            callFrame->uncheckedR(srcDst) = jsNumber(number.uncheckedGetNumber() + 1);
+            JSValue result = jsNumber(number.uncheckedGetNumber() + 1);
+            result.updateLabel(v);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(srcDst) = result;
+
+            number.updateLabel(v);
+            number.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = number;
         }
 
@@ -1826,12 +1878,23 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int srcDst = vPC[2].u.operand;
         JSValue v = callFrame->r(srcDst).jsValue();
         if (v.isInt32() && v.asInt32() > INT_MIN) {
-            callFrame->uncheckedR(srcDst) = jsNumber(v.asInt32() - 1);
+            JSValue result = jsNumber(v.asInt32() - 1);
+            result.updateLabel(v);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(srcDst) = result;
+
+            v.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = v;
         } else {
             JSValue number = callFrame->r(srcDst).jsValue().toJSNumber(callFrame);
             CHECK_FOR_EXCEPTION();
-            callFrame->uncheckedR(srcDst) = jsNumber(number.uncheckedGetNumber() - 1);
+            JSValue result = jsNumber(number.uncheckedGetNumber() - 1);
+            result.updateLabel(v);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(srcDst) = result;
+
+            number.updateLabel(v);
+            number.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = number;
         }
 
@@ -1849,11 +1912,14 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
         JSValue srcVal = callFrame->r(src).jsValue();
 
-        if (LIKELY(srcVal.isNumber()))
-            callFrame->uncheckedR(dst) = callFrame->r(src);
-        else {
+        if (LIKELY(srcVal.isNumber())) {
+            srcVal.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = srcVal;
+        } else {
             JSValue result = srcVal.toJSNumber(callFrame);
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(srcVal);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -1868,11 +1934,16 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
-        if (src.isInt32() && (src.asInt32() & 0x7fffffff)) // non-zero and no overflow
-            callFrame->uncheckedR(dst) = jsNumber(-src.asInt32());
-        else {
+        if (src.isInt32() && (src.asInt32() & 0x7fffffff)) {// non-zero and no overflow
+            JSValue result = jsNumber(-src.asInt32());
+            result.updateLabel(src);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber(-src.toNumber(callFrame));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(src);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -1889,11 +1960,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-        if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | (src2.asInt32() & 0xc0000000))) // no overflow
-            callFrame->uncheckedR(dst) = jsNumber(src1.asInt32() + src2.asInt32());
-        else {
+        if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | (src2.asInt32() & 0xc0000000))) { // no overflow
+            JSValue result = jsNumber(src1.asInt32() + src2.asInt32());
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsAdd(callFrame, src1, src2);
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
         vPC += OPCODE_LENGTH(op_add);
@@ -1908,11 +1986,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-        if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | src2.asInt32() >> 15)) // no overflow
-                callFrame->uncheckedR(dst) = jsNumber(src1.asInt32() * src2.asInt32());
-        else {
+        if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | src2.asInt32() >> 15)) { // no overflow
+            JSValue result = jsNumber(src1.asInt32() * src2.asInt32());
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber(src1.toNumber(callFrame) * src2.toNumber(callFrame));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -1932,6 +2017,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
         JSValue result = jsNumber(dividend.toNumber(callFrame) / divisor.toNumber(callFrame));
         CHECK_FOR_EXCEPTION();
+        result.updateLabel(dividend);
+        result.updateLabel(divisor);
+        result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
 
         vPC += OPCODE_LENGTH(op_div);
@@ -1951,6 +2039,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         if (dividend.isInt32() && divisor.isInt32() && divisor.asInt32() != 0) {
             JSValue result = jsNumber(dividend.asInt32() % divisor.asInt32());
             ASSERT(result);
+            result.updateLabel(dividend);
+            result.updateLabel(divisor);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
             vPC += OPCODE_LENGTH(op_mod);
             NEXT_INSTRUCTION();
@@ -1962,6 +2053,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         double d2 = divisor.toNumber(callFrame);
         JSValue result = jsNumber(fmod(d1, d2));
         CHECK_FOR_EXCEPTION();
+        result.updateLabel(dividend);
+        result.updateLabel(divisor);
+        result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
         vPC += OPCODE_LENGTH(op_mod);
         NEXT_INSTRUCTION();
@@ -1976,10 +2070,17 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-        if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | (src2.asInt32() & 0xc0000000))) // no overflow
-            callFrame->uncheckedR(dst) = jsNumber(src1.asInt32() - src2.asInt32());
-        else {
+        if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | (src2.asInt32() & 0xc0000000))) { // no overflow
+            JSValue result = jsNumber(src1.asInt32() - src2.asInt32());
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber(src1.toNumber(callFrame) - src2.toNumber(callFrame));
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
             CHECK_FOR_EXCEPTION();
             callFrame->uncheckedR(dst) = result;
         }
@@ -1997,11 +2098,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue val = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue shift = callFrame->r(vPC[3].u.operand).jsValue();
 
-        if (val.isInt32() && shift.isInt32())
-            callFrame->uncheckedR(dst) = jsNumber(val.asInt32() << (shift.asInt32() & 0x1f));
-        else {
+        if (val.isInt32() && shift.isInt32()) {
+            JSValue result = jsNumber(val.asInt32() << (shift.asInt32() & 0x1f));
+            result.updateLabel(val);
+            result.updateLabel(shift);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber((val.toInt32(callFrame)) << (shift.toUInt32(callFrame) & 0x1f));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(val);
+            result.updateLabel(shift);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2019,10 +2127,17 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue val = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue shift = callFrame->r(vPC[3].u.operand).jsValue();
 
-        if (val.isInt32() && shift.isInt32())
-            callFrame->uncheckedR(dst) = jsNumber(val.asInt32() >> (shift.asInt32() & 0x1f));
-        else {
+        if (val.isInt32() && shift.isInt32()) {
+            JSValue result = jsNumber(val.asInt32() >> (shift.asInt32() & 0x1f));
+            result.updateLabel(val);
+            result.updateLabel(shift);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber((val.toInt32(callFrame)) >> (shift.toUInt32(callFrame) & 0x1f));
+            result.updateLabel(val);
+            result.updateLabel(shift);
+            result.updateLabel(programCounter.Head());
             CHECK_FOR_EXCEPTION();
             callFrame->uncheckedR(dst) = result;
         }
@@ -2040,11 +2155,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue val = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue shift = callFrame->r(vPC[3].u.operand).jsValue();
-        if (val.isUInt32() && shift.isInt32())
-            callFrame->uncheckedR(dst) = jsNumber(val.asInt32() >> (shift.asInt32() & 0x1f));
-        else {
+        if (val.isUInt32() && shift.isInt32()) {
+            JSValue result = jsNumber(val.asInt32() >> (shift.asInt32() & 0x1f));
+            result.updateLabel(val);
+            result.updateLabel(shift);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber((val.toUInt32(callFrame)) >> (shift.toUInt32(callFrame) & 0x1f));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(val);
+            result.updateLabel(shift);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2061,11 +2183,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-        if (src1.isInt32() && src2.isInt32())
-            callFrame->uncheckedR(dst) = jsNumber(src1.asInt32() & src2.asInt32());
-        else {
+        if (src1.isInt32() && src2.isInt32()) {
+            JSValue result = jsNumber(src1.asInt32() & src2.asInt32());
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber(src1.toInt32(callFrame) & src2.toInt32(callFrame));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2082,11 +2211,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-        if (src1.isInt32() && src2.isInt32())
-            callFrame->uncheckedR(dst) = jsNumber(src1.asInt32() ^ src2.asInt32());
-        else {
+        if (src1.isInt32() && src2.isInt32()) {
+            JSValue result = jsNumber(src1.asInt32() ^ src2.asInt32());
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber(src1.toInt32(callFrame) ^ src2.toInt32(callFrame));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2103,11 +2239,18 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
-        if (src1.isInt32() && src2.isInt32())
-            callFrame->uncheckedR(dst) = jsNumber(src1.asInt32() | src2.asInt32());
-        else {
-            JSValue result = jsNumber(src1.toInt32(callFrame) | src2.toInt32(callFrame));
+        if (src1.isInt32() && src2.isInt32()) {
+            JSValue result = jsNumber(src1.asInt32() | src2.asInt32());
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
+            JSValue result = jsNumber(src1.toInt32(callFrame) ^ src2.toInt32(callFrame));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(src1);
+            result.updateLabel(src2);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2122,11 +2265,16 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
-        if (src.isInt32())
-            callFrame->uncheckedR(dst) = jsNumber(~src.asInt32());
-        else {
+        if (src.isInt32()) {
+            JSValue result = jsNumber(~src.asInt32());
+            result.updateLabel(src);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             JSValue result = jsNumber(~src.toInt32(callFrame));
             CHECK_FOR_EXCEPTION();
+            result.updateLabel(src);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
         vPC += OPCODE_LENGTH(op_bitnot);
@@ -2139,15 +2287,17 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
            boolean), and puts the result in register dst.
         */
         int dst = vPC[1].u.operand;
-        int src = vPC[2].u.operand;
-        JSValue result = jsBoolean(!callFrame->r(src).jsValue().toBoolean(callFrame));
+        JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
+        JSValue result = jsBoolean(!src.toBoolean(callFrame));
         CHECK_FOR_EXCEPTION();
+        result.updateLabel(src);
+        result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
 
         vPC += OPCODE_LENGTH(op_not);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_check_has_instance) { //instrument - output
+    DEFINE_OPCODE(op_check_has_instance) { //instrument - output -- this doesn't have output, it just throws an exception sometimes, and we aren't doing anything with exceptions yet
         /* check_has_instance constructor(r)
 
            Check 'constructor' is an object with the internal property
@@ -2186,9 +2336,15 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
         ASSERT(!isInvalidParamForInstanceOf(callFrame, baseVal, exceptionValue));
 
-        bool result = asObject(baseVal)->hasInstance(callFrame, callFrame->r(value).jsValue(), callFrame->r(baseProto).jsValue());
+        // start modified code
+        JSValue result = jsBoolean(asObject(baseVal)->hasInstance(callFrame, callFrame->r(value).jsValue(), callFrame->r(baseProto).jsValue()));
         CHECK_FOR_EXCEPTION();
-        callFrame->uncheckedR(dst) = jsBoolean(result);
+        result.updateLabel(callFrame->r(value).jsValue());
+        result.updateLabel(baseVal);
+        result.updateLabel(callFrame->r(baseProto).jsValue());
+		result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_instanceof);
         NEXT_INSTRUCTION();
@@ -2201,7 +2357,13 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
-        callFrame->uncheckedR(dst) = JSValue(jsTypeStringForValue(callFrame, callFrame->r(src).jsValue()));
+        // start modified code
+        JSValue v = callFrame->r(src).jsValue();
+        JSValue result = JSValue(jsTypeStringForValue(callFrame, v));
+        result.updateLabel(v);
+		result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_typeof);
         NEXT_INSTRUCTION();
@@ -2216,7 +2378,13 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
         JSValue v = callFrame->r(src).jsValue();
-        callFrame->uncheckedR(dst) = jsBoolean(v.isCell() ? v.asCell()->structure()->typeInfo().masqueradesAsUndefined() : v.isUndefined());
+        //callFrame->uncheckedR(dst) = jsBoolean(v.isCell() ? v.asCell()->structure()->typeInfo().masqueradesAsUndefined() : v.isUndefined());
+        // start modified code
+        JSValue result = jsBoolean(v.isCell() ? v.asCell()->structure()->typeInfo().masqueradesAsUndefined() : v.isUndefined());
+        result.updateLabel(v);
+		result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_is_undefined);
         NEXT_INSTRUCTION();
@@ -2230,7 +2398,14 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
-        callFrame->uncheckedR(dst) = jsBoolean(callFrame->r(src).jsValue().isBoolean());
+        //callFrame->uncheckedR(dst) = jsBoolean(callFrame->r(src).jsValue().isBoolean()));
+        // start modified code
+        JSValue v = callFrame->r(src).jsValue();
+        JSValue result = jsBoolean(v.isBoolean());
+        result.updateLabel(v);
+		result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_is_boolean);
         NEXT_INSTRUCTION();
@@ -2244,7 +2419,14 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
-        callFrame->uncheckedR(dst) = jsBoolean(callFrame->r(src).jsValue().isNumber());
+        //callFrame->uncheckedR(dst) = jsBoolean(callFrame->r(src).jsValue().isNumber()));
+        // start modified code
+        JSValue v = callFrame->r(src).jsValue();
+        JSValue result = jsBoolean(v.isNumber());
+        result.updateLabel(v);
+		result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_is_number);
         NEXT_INSTRUCTION();
@@ -2258,7 +2440,14 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
-        callFrame->uncheckedR(dst) = jsBoolean(callFrame->r(src).jsValue().isString());
+        //callFrame->uncheckedR(dst) = jsBoolean(callFrame->r(src).jsValue().isString()));
+        // start modified code
+        JSValue v = callFrame->r(src).jsValue();
+        JSValue result = jsBoolean(v.isString());
+        result.updateLabel(v);
+		result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_is_string);
         NEXT_INSTRUCTION();
@@ -2272,7 +2461,14 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
-        callFrame->uncheckedR(dst) = jsBoolean(jsIsObjectType(callFrame->r(src).jsValue()));
+        //callFrame->uncheckedR(dst) = jsBoolean(jsIsObjectType(callFrame->r(src).jsValue()));
+        // start modified code
+        JSValue v = callFrame->r(src).jsValue();
+        JSValue result = jsBoolean(jsIsObjectType(v));
+        result.updateLabel(v);
+		result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_is_object);
         NEXT_INSTRUCTION();
@@ -2286,7 +2482,14 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
-        callFrame->uncheckedR(dst) = jsBoolean(jsIsFunctionType(callFrame->r(src).jsValue()));
+        //callFrame->uncheckedR(dst) = jsBoolean(jsIsFunctionType(callFrame->r(src).jsValue()));
+        // start modified code
+        JSValue v = callFrame->r(src).jsValue();
+        JSValue result = jsBoolean(jsIsFunctionType(v));
+        result.updateLabel(v);
+		result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_is_function);
         NEXT_INSTRUCTION();
@@ -2313,18 +2516,28 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue propName = callFrame->r(property).jsValue();
 
         uint32_t i;
-        if (propName.getUInt32(i))
-            callFrame->uncheckedR(dst) = jsBoolean(baseObj->hasProperty(callFrame, i));
-        else {
+        if (propName.getUInt32(i)) {
+            //callFrame->uncheckedR(dst) = jsBoolean(baseObj->hasProperty(callFrame, i));
+            JSValue result = jsBoolean(baseObj->hasProperty(callFrame, i));
+            result.updateLabel(baseVal);
+            result.updateLabel(propName);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        } else {
             Identifier property(callFrame, propName.toString(callFrame));
             CHECK_FOR_EXCEPTION();
-            callFrame->uncheckedR(dst) = jsBoolean(baseObj->hasProperty(callFrame, property));
+            //callFrame->uncheckedR(dst) = jsBoolean(baseObj->hasProperty(callFrame, property));
+            JSValue result = jsBoolean(baseObj->hasProperty(callFrame, property));
+            result.updateLabel(baseVal);
+            result.updateLabel(propName);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
         }
 
         vPC += OPCODE_LENGTH(op_in);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve) { //instrument - join
+    DEFINE_OPCODE(op_resolve) { //instrument - join -- TODO: Figure out how to do this
         /* resolve dst(r) property(id)
 
            Looks up the property named by identifier property in the
@@ -2337,7 +2550,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_resolve);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_skip) { //instrument - join
+    DEFINE_OPCODE(op_resolve_skip) { //instrument - join -- TODO: Figure out how to do this
         /* resolve_skip dst(r) property(id) skip(n)
 
          Looks up the property named by identifier property in the
@@ -2351,7 +2564,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_global) { //instrument - join
+    DEFINE_OPCODE(op_resolve_global) { //instrument - join -- TODO: Figure out how to do this
         /* resolve_skip dst(r) globalObject(c) property(id) structure(sID) offset(n)
          
            Performs a dynamic property lookup for the given property, on the provided
@@ -2366,7 +2579,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_global_dynamic) { //instrument - join
+    DEFINE_OPCODE(op_resolve_global_dynamic) { //instrument - join -- TODO: Figure out how to do this
         /* resolve_skip dst(r) globalObject(c) property(id) structure(sID) offset(n), depth(n)
          
          Performs a dynamic property lookup for the given property, on the provided
@@ -2384,7 +2597,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_global_var) { //instrument - context
+    DEFINE_OPCODE(op_get_global_var) { //instrument - context -- TODO: Figure out how to do this
         /* get_global_var dst(r) globalObject(c) index(n)
 
            Gets the global var at global slot index and places it in register dst.
@@ -2408,11 +2621,16 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int index = vPC[1].u.operand;
         int value = vPC[2].u.operand;
         
-        scope->registerAt(index).set(*globalData, scope, callFrame->r(value).jsValue());
+        //scope->registerAt(index).set(*globalData, scope, callFrame->r(value).jsValue());
+        // start modified code
+        JSValue result = callFrame->r(value).jsValue();
+        result.updateLabel(programCounter.Head());
+        scope->registerAt(index).set(*globalData, scope, result);
+        // end modified code
         vPC += OPCODE_LENGTH(op_put_global_var);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_scoped_var) { //instrument - context
+    DEFINE_OPCODE(op_get_scoped_var) { //instrument - context -- TODO: Figure out how to do this
         /* get_scoped_var dst(r) index(n) skip(n)
 
          Loads the contents of the index-th local from the scope skip nodes from
@@ -2444,7 +2662,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_get_scoped_var);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_scoped_var) { //instrument - context
+    DEFINE_OPCODE(op_put_scoped_var) { //instrument - context -- TODO: Figure out how to do this
         /* put_scoped_var index(n) skip(n) value(r)
 
          */
@@ -2475,7 +2693,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_put_scoped_var);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_base) { //instrument - context
+    DEFINE_OPCODE(op_resolve_base) { //instrument - context -- TODO: Figure out how to do this
         /* resolve_base dst(r) property(id) isStrict(bool)
 
            Searches the scope chain for an object containing
@@ -2490,7 +2708,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_resolve_base);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_ensure_property_exists) { //instrument - context
+    DEFINE_OPCODE(op_ensure_property_exists) { //instrument - context -- TODO: Figure out how to do this
         /* ensure_property_exists base(r) property(id)
 
            Throws an exception if property does not exist on base
@@ -2510,7 +2728,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_ensure_property_exists);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_resolve_with_base) { //instrument - context
+    DEFINE_OPCODE(op_resolve_with_base) { //instrument - context -- TODO: Figure out how to do this
         /* resolve_with_base baseDst(r) propDst(r) property(id)
 
            Searches the scope chain for an object containing
@@ -2528,7 +2746,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_resolve_with_base);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_by_id) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id) { //instrument - context -- TODO: Figure out how to do this
         /* get_by_id dst(r) base(r) property(id) structure(sID) nop(n) nop(n) nop(n)
 
            Generic property access: Gets the property named by identifier
@@ -2550,7 +2768,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_get_by_id);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_by_id_self) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_self) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_self dst(r) base(r) property(id) structure(sID) offset(n) nop(n) nop(n)
 
            Cached property access: Attempts to get a cached property from the
@@ -2581,7 +2799,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         uncacheGetByID(codeBlock, vPC);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_by_id_proto) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_proto) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_proto dst(r) base(r) property(id) structure(sID) prototypeStructure(sID) offset(n) nop(n)
 
            Cached property access: Attempts to get a cached property from the
@@ -2620,7 +2838,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_getter_proto);
 #endif
-    DEFINE_OPCODE(op_get_by_id_getter_proto) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_getter_proto) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_getter_proto dst(r) base(r) property(id) structure(sID) prototypeStructure(sID) offset(n) nop(n)
          
          Cached property access: Attempts to get a cached getter property from the
@@ -2665,7 +2883,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_custom_proto);
 #endif
-    DEFINE_OPCODE(op_get_by_id_custom_proto) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_custom_proto) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_custom_proto dst(r) base(r) property(id) structure(sID) prototypeStructure(sID) offset(n) nop(n)
          
          Cached property access: Attempts to use a cached named property getter
@@ -2749,7 +2967,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_get_by_id_chain);
 #endif
-    DEFINE_OPCODE(op_get_by_id_chain) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_chain) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_chain dst(r) base(r) property(id) structure(sID) structureChain(chain) count(n) offset(n)
 
            Cached property access: Attempts to get a cached property from the
@@ -2799,7 +3017,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
     skip_get_by_id_chain:
     goto *(&&skip_id_getter_self);
 #endif
-    DEFINE_OPCODE(op_get_by_id_getter_self) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_getter_self) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_self dst(r) base(r) property(id) structure(sID) offset(n) nop(n) nop(n)
          
          Cached property access: Attempts to get a cached property from the
@@ -2842,7 +3060,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_custom_self);
 #endif
-    DEFINE_OPCODE(op_get_by_id_custom_self) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_custom_self) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_custom_self dst(r) base(r) property(id) structure(sID) offset(n) nop(n) nop(n)
          
          Cached property access: Attempts to use a cached named property getter
@@ -2876,7 +3094,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
 skip_id_custom_self:
 #endif
-    DEFINE_OPCODE(op_get_by_id_generic) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_generic) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_generic dst(r) base(r) property(id) nop(sID) nop(n) nop(n) nop(n)
 
            Generic property access: Gets the property named by identifier
@@ -2899,7 +3117,7 @@ skip_id_custom_self:
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_getter_chain);
 #endif
-    DEFINE_OPCODE(op_get_by_id_getter_chain) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_getter_chain) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_getter_chain dst(r) base(r) property(id) structure(sID) structureChain(chain) count(n) offset(n)
          
          Cached property access: Attempts to get a cached property from the
@@ -2954,7 +3172,7 @@ skip_id_custom_self:
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
     goto *(&&skip_id_custom_chain);
 #endif
-    DEFINE_OPCODE(op_get_by_id_custom_chain) { //instrument - context
+    DEFINE_OPCODE(op_get_by_id_custom_chain) { //instrument - context -- TODO: Figure out how to do this
         /* op_get_by_id_custom_chain dst(r) base(r) property(id) structure(sID) structureChain(chain) count(n) offset(n)
          
          Cached property access: Attempts to use a cached named property getter on the
@@ -3016,7 +3234,13 @@ skip_id_custom_self:
         JSValue baseValue = callFrame->r(base).jsValue();
         if (LIKELY(isJSArray(globalData, baseValue))) {
             int dst = vPC[1].u.operand;
-            callFrame->uncheckedR(dst) = jsNumber(asArray(baseValue)->length());
+            //callFrame->uncheckedR(dst) = jsNumber(asArray(baseValue)->length());
+            // start modified code
+            JSValue result = jsNumber(asArray(baseValue)->length());
+            result.updateLabel(baseValue);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+            // end modified code
             vPC += OPCODE_LENGTH(op_get_array_length);
             NEXT_INSTRUCTION();
         }
@@ -3040,7 +3264,13 @@ skip_id_custom_self:
         JSValue baseValue = callFrame->r(base).jsValue();
         if (LIKELY(isJSString(globalData, baseValue))) {
             int dst = vPC[1].u.operand;
-            callFrame->uncheckedR(dst) = jsNumber(asString(baseValue)->length());
+            //callFrame->uncheckedR(dst) = jsNumber(asString(baseValue)->length());
+            // start modified code
+            JSValue result = jsNumber(asString(baseValue)->length());
+            result.updateLabel(baseValue);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+            // end modified code
             vPC += OPCODE_LENGTH(op_get_string_length);
             NEXT_INSTRUCTION();
         }
@@ -3052,7 +3282,7 @@ skip_id_custom_self:
     skip_get_string_length:
     goto *(&&skip_put_by_id);
 #endif
-    DEFINE_OPCODE(op_put_by_id) { //instrument - context
+    DEFINE_OPCODE(op_put_by_id) { //instrument - context -- TODO: Figure out how to do this
         /* put_by_id base(r) property(id) value(r) nop(n) nop(n) nop(n) nop(n) direct(b)
 
            Generic property access: Sets the property named by identifier
@@ -3088,7 +3318,7 @@ skip_id_custom_self:
 #if USE(GCC_COMPUTED_GOTO_WORKAROUND)
       skip_put_by_id:
 #endif
-    DEFINE_OPCODE(op_put_by_id_transition) { //instrument - context
+    DEFINE_OPCODE(op_put_by_id_transition) { //instrument - context-- TODO: Figure out how to do this
         /* op_put_by_id_transition base(r) property(id) value(r) oldStructure(sID) newStructure(sID) structureChain(chain) offset(n) direct(b)
          
            Cached property access: Attempts to set a new property with a cached transition
@@ -3140,7 +3370,7 @@ skip_id_custom_self:
         uncachePutByID(codeBlock, vPC);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_by_id_replace) { //instrument - context
+    DEFINE_OPCODE(op_put_by_id_replace) { //instrument - context-- TODO: Figure out how to do this
         /* op_put_by_id_replace base(r) property(id) value(r) structure(sID) offset(n) nop(n) nop(n) direct(b)
 
            Cached property access: Attempts to set a pre-existing, cached
@@ -3175,7 +3405,7 @@ skip_id_custom_self:
         uncachePutByID(codeBlock, vPC);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_by_id_generic) { //instrument - context
+    DEFINE_OPCODE(op_put_by_id_generic) { //instrument - context -- TODO: Figure out how to do this
         /* op_put_by_id_generic base(r) property(id) value(r) nop(n) nop(n) nop(n) nop(n) direct(b)
 
            Generic property access: Sets the property named by identifier
@@ -3202,7 +3432,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_put_by_id_generic);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_del_by_id) { //instrument - context
+    DEFINE_OPCODE(op_del_by_id) { //instrument - context -- TODO: Figure out how to do this
         /* del_by_id dst(r) base(r) property(id)
 
            Converts register base to Object, deletes the property
@@ -3226,7 +3456,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_del_by_id);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_by_pname) {
+    DEFINE_OPCODE(op_get_by_pname) { // -- TODO: Figure out how to do this
         int dst = vPC[1].u.operand;
         int base = vPC[2].u.operand;
         int property = vPC[3].u.operand;
@@ -3255,7 +3485,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_get_by_pname);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_arguments_length) {
+    DEFINE_OPCODE(op_get_arguments_length) { // -- TODO: Figure out how to do this
         int dst = vPC[1].u.operand;
         int argumentsRegister = vPC[2].u.operand;
         int property = vPC[3].u.operand;
@@ -3272,7 +3502,8 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_get_arguments_length);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_argument_by_val) {
+    DEFINE_OPCODE(op_get_argument_by_val) { // -- TODO: Figure out how to do this
+
         int dst = vPC[1].u.operand;
         int argumentsRegister = vPC[2].u.operand;
         int property = vPC[3].u.operand;
@@ -3332,11 +3563,16 @@ skip_id_custom_self:
         }
 
         CHECK_FOR_EXCEPTION();
+        // start modified code
+        result.updateLabel(baseValue);
+        result.updateLabel(subscript);
+        result.updateLabel(programCounter.Head());
+        // end modified code
         callFrame->uncheckedR(dst) = result;
         vPC += OPCODE_LENGTH(op_get_by_val);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_by_val) { //instrument - context
+    DEFINE_OPCODE(op_put_by_val) { //instrument - context-- TODO: Figure out how to do this
         /* put_by_val base(r) property(r) value(r)
 
            Sets register value on register base as the property named
@@ -3386,7 +3622,8 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_put_by_val);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_del_by_val) { //instrument - context
+    DEFINE_OPCODE(op_del_by_val) { //instrument - context // -- TODO: Figure out how to do this
+
         /* del_by_val dst(r) base(r) property(r)
 
            Converts register base to Object, deletes the property
@@ -3420,7 +3657,8 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_del_by_val);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_put_by_index) { //instrument - ?
+    DEFINE_OPCODE(op_put_by_index) { //instrument - ? // -- TODO: Figure out how to do this
+
         /* put_by_index base(r) property(n) value(r)
 
            Sets register value on register base as the property named
@@ -3465,6 +3703,7 @@ skip_id_custom_self:
 		 
 		Dummy opcode to enable proper program counter behavior
 		*/
+        programCounter.Pop();
 		vPC += OPCODE_LENGTH(op_joint);
 		NEXT_INSTRUCTION();
 	}
@@ -3495,7 +3734,11 @@ skip_id_custom_self:
          */
         int cond = vPC[1].u.operand;
         int target = vPC[2].u.operand;
-        if (callFrame->r(cond).jsValue().toBoolean(callFrame)) {
+        // begin modified code
+        JSValue v = callFrame->r(cond).jsValue();
+        programCounter.Push(v.label, (long) vPC);
+        if (v.toBoolean(callFrame)) {
+        // end modified code
             vPC += target;
             CHECK_FOR_TIMEOUT();
             NEXT_INSTRUCTION();
@@ -3515,7 +3758,11 @@ skip_id_custom_self:
          */
         int cond = vPC[1].u.operand;
         int target = vPC[2].u.operand;
-        if (!callFrame->r(cond).jsValue().toBoolean(callFrame)) {
+        // begin modified code
+        JSValue v = callFrame->r(cond).jsValue();
+        programCounter.Push(v.label, (long) vPC);
+        if (!v.toBoolean(callFrame)) {
+        // end modified code
             vPC += target;
             CHECK_FOR_TIMEOUT();
             NEXT_INSTRUCTION();
@@ -3532,7 +3779,12 @@ skip_id_custom_self:
         */
         int cond = vPC[1].u.operand;
         int target = vPC[2].u.operand;
-        if (callFrame->r(cond).jsValue().toBoolean(callFrame)) {
+        // begin modified code
+        JSValue v = callFrame->r(cond).jsValue();
+        programCounter.Push(v.label, (long) vPC);
+        if (v.toBoolean(callFrame)) {
+        // end modified code
+        //if (callFrame->r(cond).jsValue().toBoolean(callFrame)) {
             vPC += target;
             NEXT_INSTRUCTION();
         }
@@ -3548,7 +3800,12 @@ skip_id_custom_self:
         */
         int cond = vPC[1].u.operand;
         int target = vPC[2].u.operand;
-        if (!callFrame->r(cond).jsValue().toBoolean(callFrame)) {
+        // begin modified code
+        JSValue v = callFrame->r(cond).jsValue();
+        programCounter.Push(v.label, (long) vPC);
+        if (!v.toBoolean(callFrame)) {
+        // end modified code
+        //if (!callFrame->r(cond).jsValue().toBoolean(callFrame)) {
             vPC += target;
             NEXT_INSTRUCTION();
         }
@@ -3565,7 +3822,11 @@ skip_id_custom_self:
         int src = vPC[1].u.operand;
         int target = vPC[2].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
-
+        
+        // begin modified code
+        programCounter.Push(srcValue.label, (long) vPC);
+        // end modified code
+        
         if (srcValue.isUndefinedOrNull() || (srcValue.isCell() && srcValue.asCell()->structure()->typeInfo().masqueradesAsUndefined())) {
             vPC += target;
             NEXT_INSTRUCTION();
@@ -3579,10 +3840,14 @@ skip_id_custom_self:
 
            Jumps to offset target from the current instruction, if and
            only if register src is not null.
-        */
+         */
         int src = vPC[1].u.operand;
         int target = vPC[2].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
+
+        // begin modified code
+        programCounter.Push(srcValue.label, (long) vPC);
+        // end modified code
 
         if (!srcValue.isUndefinedOrNull() && (!srcValue.isCell() || !srcValue.asCell()->structure()->typeInfo().masqueradesAsUndefined())) {
             vPC += target;
@@ -3592,7 +3857,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_jneq_null);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_jneq_ptr) {
+    DEFINE_OPCODE(op_jneq_ptr) { // TODO: what about the ptr's label?
         /* jneq_ptr src(r) ptr(jsCell) target(offset)
          
            Jumps to offset target from the current instruction, if the value r is equal
@@ -3601,6 +3866,9 @@ skip_id_custom_self:
         int src = vPC[1].u.operand;
         int target = vPC[3].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
+        // begin modified code
+        programCounter.Push(srcValue.label, (long) vPC);
+        // end modified code
         if (srcValue != vPC[2].u.jsCell.get()) {
             vPC += target;
             NEXT_INSTRUCTION();
@@ -3626,6 +3894,10 @@ skip_id_custom_self:
         
         bool result = jsLess(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+       
+        // begin modified code
+        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+        // end modified code
         
         if (result) {
             vPC += target;
@@ -3653,6 +3925,10 @@ skip_id_custom_self:
         
         bool result = jsLessEq(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+       
+        // begin modified code
+        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+        // end modified code
         
         if (result) {
             vPC += target;
@@ -3677,6 +3953,10 @@ skip_id_custom_self:
 
         bool result = jsLess(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+       
+        // begin modified code
+        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+        // end modified code
         
         if (!result) {
             vPC += target;
@@ -3700,6 +3980,10 @@ skip_id_custom_self:
 
         bool result = jsLess(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+       
+        // begin modified code
+        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+        // end modified code
         
         if (result) {
             vPC += target;
@@ -3723,6 +4007,10 @@ skip_id_custom_self:
 
         bool result = jsLessEq(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+       
+        // begin modified code
+        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+        // end modified code
         
         if (!result) {
             vPC += target;
@@ -3746,6 +4034,10 @@ skip_id_custom_self:
         
         bool result = jsLessEq(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+       
+        // begin modified code
+        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+        // end modified code
         
         if (result) {
             vPC += target;

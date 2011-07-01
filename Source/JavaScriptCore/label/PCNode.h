@@ -20,10 +20,10 @@ namespace JSC {
 		int loc;
 		
 	public:
-		PCNode(PCNode*, JSLabel, int); // constructor
+		PCNode(PCNode*, JSLabel, long); // constructor
 		PCNode* Next(); // next node (for pop)
 		JSLabel Val(); // return value
-		int Loc(); 
+		long Loc(); 
 	};
 }
 

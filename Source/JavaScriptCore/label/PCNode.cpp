@@ -12,7 +12,7 @@
 
 namespace JSC {
 	
-	PCNode::PCNode(PCNode *n, JSLabel l, int i) {
+	PCNode::PCNode(PCNode *n, JSLabel l, long i) {
 		node = n;
 		value = l;
 		loc = i;
@@ -22,7 +22,7 @@ namespace JSC {
 		return value;
 	}
 	
-	int PCNode::Loc() {
+	long PCNode::Loc() {
 		return loc;
 	}
 	
