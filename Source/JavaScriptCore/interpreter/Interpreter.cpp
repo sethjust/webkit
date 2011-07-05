@@ -3736,7 +3736,8 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-        programCounter.Push(v.label, (long) vPC);
+        if (!(programCounter.Loc() == (long)vPC))
+            programCounter.Push(v.label, (long) vPC);
         if (v.toBoolean(callFrame)) {
         // end modified code
             vPC += target;
@@ -3760,7 +3761,8 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-        programCounter.Push(v.label, (long) vPC);
+        if (!(programCounter.Loc() == (long)vPC))
+            programCounter.Push(v.label, (long) vPC);
         if (!v.toBoolean(callFrame)) {
         // end modified code
             vPC += target;
@@ -3896,7 +3898,8 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+        if (!(programCounter.Loc() == (long)vPC))
+            programCounter.Push(src1.label.Join(src2.label), (long) vPC);
         // end modified code
         
         if (result) {
@@ -3927,7 +3930,8 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+        if (!(programCounter.Loc() == (long)vPC))
+            programCounter.Push(src1.label.Join(src2.label), (long) vPC);
         // end modified code
         
         if (result) {
@@ -4047,7 +4051,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_jlesseq);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_imm) {
+    DEFINE_OPCODE(op_switch_imm) { // TODO
         /* switch_imm tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a range checked switch on the scrutinee value, using
@@ -4071,7 +4075,7 @@ skip_id_custom_self:
         }
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_char) {
+    DEFINE_OPCODE(op_switch_char) { // TODO
         /* switch_char tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a range checked switch on the scrutinee value, using
@@ -4094,7 +4098,7 @@ skip_id_custom_self:
         }
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_string) {
+    DEFINE_OPCODE(op_switch_string) { // TODO
         /* switch_string tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a sparse hashmap based switch on the value in the scrutinee
@@ -4124,8 +4128,16 @@ skip_id_custom_self:
         int func = vPC[2].u.operand;
         int shouldCheck = vPC[3].u.operand;
         ASSERT(codeBlock->codeType() != FunctionCode || !codeBlock->needsFullScopeChain() || callFrame->r(codeBlock->activationRegister()).jsValue());
-        if (!shouldCheck || !callFrame->r(dst).jsValue())
-            callFrame->uncheckedR(dst) = JSValue(codeBlock->functionDecl(func)->make(callFrame, callFrame->scopeChain()));
+		// begin modified code
+        if (!shouldCheck || !callFrame->r(dst).jsValue()) {
+            //callFrame->uncheckedR(dst) = JSValue(codeBlock->functionDecl(func)->make(callFrame, callFrame->scopeChain()));
+            JSValue result = JSValue(codeBlock->functionDecl(func)->make(callFrame, callFrame->scopeChain()));
+            // TODO: Handle label from func
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+		}
+        // end modified code
+			
 
         vPC += OPCODE_LENGTH(op_new_func);
         NEXT_INSTRUCTION();
@@ -4157,12 +4169,18 @@ skip_id_custom_self:
             func->setScope(*globalData, func->scope()->push(functionScopeObject));
         }
 
-        callFrame->uncheckedR(dst) = JSValue(func);
+        //callFrame->uncheckedR(dst) = JSValue(func);
+        // begin modified code
+        JSValue result = JSValue(func);
+        // TODO: handle label from func
+        result.updateLabel(programCounter.Head());
+		callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_new_func_exp);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_call_eval) { //instrument - whatever we choose to do with eval
+    DEFINE_OPCODE(op_call_eval) { //instrument - whatever we choose to do with eval // TODO
         /* call_eval func(r) argCount(n) registerOffset(n)
 
            Call a function named "eval" with no explicit "this" value
@@ -4200,7 +4218,7 @@ skip_id_custom_self:
         // instruction as a normal function call.
         // fall through to op_call
     }
-    DEFINE_OPCODE(op_call) { //instrument - push to PC
+    DEFINE_OPCODE(op_call) { //instrument - push to PC // TODO
         /* call func(r) argCount(n) registerOffset(n)
 
            Perform a function call.
@@ -4278,7 +4296,7 @@ skip_id_custom_self:
         exceptionValue = createNotAFunctionError(callFrame, v);
         goto vm_throw;
     }
-    DEFINE_OPCODE(op_load_varargs) { //instrument - !!
+    DEFINE_OPCODE(op_load_varargs) { //instrument - !! // TODO
         int argCountDst = vPC[1].u.operand;
         int argsOffset = vPC[2].u.operand;
         
@@ -4357,7 +4375,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_load_varargs);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_call_varargs) { //instrument - OH DEAR BABY JESUS
+    DEFINE_OPCODE(op_call_varargs) { //instrument - OH DEAR BABY JESUS // TODO
         /* call_varargs func(r) argCountReg(r) baseRegisterOffset(n)
          
          Perform a function call with a dynamic set of arguments.
@@ -4436,7 +4454,7 @@ skip_id_custom_self:
         exceptionValue = createNotAFunctionError(callFrame, v);
         goto vm_throw;
     }
-    DEFINE_OPCODE(op_tear_off_activation) { //instrument - context
+    DEFINE_OPCODE(op_tear_off_activation) { //instrument - context // TODO: does this need anything?
         /* tear_off_activation activation(r) arguments(r)
 
            Copy locals and named parameters from the register file to the heap.
@@ -4466,7 +4484,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_tear_off_activation);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_tear_off_arguments) { //instrument - context
+    DEFINE_OPCODE(op_tear_off_arguments) { //instrument - context // TODO: does this need anything?
         /* tear_off_arguments arguments(r)
 
            Copy named parameters from the register file to the heap. Point the
@@ -4487,7 +4505,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_tear_off_arguments);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_ret) { //instrument - context
+    DEFINE_OPCODE(op_ret) { //instrument - context // TODO: pop programcounter once we have calls pushing
         /* ret result(r)
            
            Return register result as the return value of the current
@@ -4499,7 +4517,7 @@ skip_id_custom_self:
 
         int result = vPC[1].u.operand;
 
-        JSValue returnValue = callFrame->r(result).jsValue();
+        JSValue returnValue = callFrame->r(result).jsValue(); // This should carry the label along
 
         vPC = callFrame->returnVPC();
         callFrame = callFrame->callerFrame();
@@ -4520,7 +4538,7 @@ skip_id_custom_self:
            expected return value register.
         */
 
-        callFrame->uncheckedR(vPC[1].u.operand) = functionReturnValue;
+        callFrame->uncheckedR(vPC[1].u.operand) = functionReturnValue; // This should carry the label along
 
         vPC += OPCODE_LENGTH(op_call_put_result);
         NEXT_INSTRUCTION();
@@ -4537,7 +4555,7 @@ skip_id_custom_self:
 
         int result = vPC[1].u.operand;
 
-        JSValue returnValue = callFrame->r(result).jsValue();
+        JSValue returnValue = callFrame->r(result).jsValue(); // should carry label
 
         if (UNLIKELY(!returnValue.isObject()))
             returnValue = callFrame->r(vPC[2].u.operand).jsValue();
@@ -4570,7 +4588,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_enter);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_create_activation) { //instrument - context
+    DEFINE_OPCODE(op_create_activation) { // TODO: establish if this needs instrumentation
         /* create_activation dst(r)
 
            If the activation object for this callframe has not yet been created,
@@ -4592,7 +4610,12 @@ skip_id_custom_self:
            Move callee into a register.
         */
 
-        callFrame->uncheckedR(vPC[1].u.operand) = JSValue(callFrame->callee());
+        //callFrame->uncheckedR(vPC[1].u.operand) = JSValue(callFrame->callee());
+        // begin modified code
+        JSValue result = JSValue(callFrame->callee());
+        result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(vPC[1].u.operand) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_get_callee);
         NEXT_INSTRUCTION();
@@ -4621,7 +4644,12 @@ skip_id_custom_self:
             structure = asObject(proto)->inheritorID(callFrame->globalData());
         else
             structure = constructor->scope()->globalObject->emptyObjectStructure();
-        callFrame->uncheckedR(thisRegister) = constructEmptyObject(callFrame, structure);
+        //callFrame->uncheckedR(thisRegister) = constructEmptyObject(callFrame, structure);
+        // begin modified code
+        JSValue result = constructEmptyObject(callFrame, structure);
+        result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(thisRegister) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_create_this);
         NEXT_INSTRUCTION();
@@ -4639,9 +4667,17 @@ skip_id_custom_self:
         */
 
         int thisRegister = vPC[1].u.operand;
-        JSValue thisVal = callFrame->r(thisRegister).jsValue();
-        if (thisVal.needsThisConversion())
-            callFrame->uncheckedR(thisRegister) = JSValue(thisVal.toThisObject(callFrame));
+        JSValue thisVal = callFrame->r(thisRegister).jsValue(); // this maintains a label
+        //if (thisVal.needsThisConversion())
+        //    callFrame->uncheckedR(thisRegister) = JSValue(thisVal.toThisObject(callFrame));
+        // begin modified code
+        if (thisVal.needsThisConversion()) {
+            JSValue result = JSValue(thisVal.toThisObject(callFrame));
+            result.updateLabel(thisVal);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(thisRegister) = result;
+        }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_convert_this);
         NEXT_INSTRUCTION();
@@ -4659,8 +4695,16 @@ skip_id_custom_self:
         
         int thisRegister = vPC[1].u.operand;
         JSValue thisVal = callFrame->r(thisRegister).jsValue();
-        if (thisVal.isObject() && thisVal.needsThisConversion())
-            callFrame->uncheckedR(thisRegister) = JSValue(thisVal.toStrictThisObject(callFrame));
+        //if (thisVal.isObject() && thisVal.needsThisConversion())
+        //    callFrame->uncheckedR(thisRegister) = JSValue(thisVal.toStrictThisObject(callFrame));
+        // begin modified code
+        if (thisVal.isObject() && thisVal.needsThisConversion()) {
+            JSValue result = JSValue(thisVal.toStrictThisObject(callFrame));
+            result.updateLabel(thisVal);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(thisRegister) = result;
+        }
+        // end modified code
         
         vPC += OPCODE_LENGTH(op_convert_this_strict);
         NEXT_INSTRUCTION();
@@ -4674,7 +4718,12 @@ skip_id_custom_self:
          */
         int dst = vPC[1].u.operand;
 
-        callFrame->uncheckedR(dst) = JSValue();
+        //callFrame->uncheckedR(dst) = JSValue();
+        // begin modified code
+        JSValue result = JSValue();
+        result.updateLabel(programCounter.Head()); // TODO: is this neccessary?
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
         vPC += OPCODE_LENGTH(op_init_lazy_reg);
         NEXT_INSTRUCTION();
     }
@@ -4688,15 +4737,23 @@ skip_id_custom_self:
         
         int dst = vPC[1].u.operand;
 
+        JSValue result;
+
         if (!callFrame->r(dst).jsValue()) {
             Arguments* arguments = new (globalData) Arguments(callFrame);
-            callFrame->uncheckedR(dst) = JSValue(arguments);
-            callFrame->uncheckedR(unmodifiedArgumentsRegister(dst)) = JSValue(arguments);
+            //callFrame->uncheckedR(dst) = JSValue(arguments);
+            //callFrame->uncheckedR(unmodifiedArgumentsRegister(dst)) = JSValue(arguments);
+            // begin modified code
+            result = JSValue(arguments);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+            callFrame->uncheckedR(unmodifiedArgumentsRegister(dst)) = result;
+            // end modified code
         }
         vPC += OPCODE_LENGTH(op_create_arguments);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_construct) { //instrument - label new object
+    DEFINE_OPCODE(op_construct) { //instrument - label new object //TODO: all of this, particularly pushing to the stack
         /* construct func(r) argCount(n) registerOffset(n) proto(r) thisRegister(r)
 
            Invoke register "func" as a constructor. For JS
@@ -4787,7 +4844,15 @@ skip_id_custom_self:
         int src = vPC[2].u.operand;
         int count = vPC[3].u.operand;
 
-        callFrame->uncheckedR(dst) = concatenateStrings(callFrame, &callFrame->registers()[src], count);
+        //callFrame->uncheckedR(dst) = concatenateStrings(callFrame, &callFrame->registers()[src], count);
+        // begin modified code
+        JSValue result = concatenateStrings(callFrame, &callFrame->registers()[src], count);
+        for (int i=0; i<count; i++) {
+            result.updateLabel(callFrame->r(src+i).jsValue());
+        }
+        result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
         CHECK_FOR_EXCEPTION();
         vPC += OPCODE_LENGTH(op_strcat);
 
@@ -4797,7 +4862,13 @@ skip_id_custom_self:
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
 
-        callFrame->uncheckedR(dst) = callFrame->r(src).jsValue().toPrimitive(callFrame);
+        //callFrame->uncheckedR(dst) = callFrame->r(src).jsValue().toPrimitive(callFrame);
+        // begin modified code
+        JSValue result = callFrame->r(src).jsValue().toPrimitive(callFrame);
+        result.updateLabel(callFrame->r(src).jsValue());
+        result.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = result;
+        // end modified code
         vPC += OPCODE_LENGTH(op_to_primitive);
 
         NEXT_INSTRUCTION();
@@ -4830,7 +4901,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_pop_scope);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_pnames) {
+    DEFINE_OPCODE(op_get_pnames) { //TODO: I'm totally unsure that this doesn't need more work
         /* get_pnames dst(r) base(r) i(n) size(n) breakTarget(offset)
 
            Creates a property name list for register base and puts it
@@ -4859,10 +4930,16 @@ skip_id_custom_self:
         callFrame->uncheckedR(base) = JSValue(o);
         callFrame->uncheckedR(i) = Register::withInt(0);
         callFrame->uncheckedR(size) = Register::withInt(jsPropertyNameIterator->size());
+        // begin modified code
+        callFrame->uncheckedR(dst).jsValue().updateLabel(v);
+        callFrame->uncheckedR(dst).jsValue().updateLabel(programCounter.Head());
+        callFrame->uncheckedR(size).jsValue().updateLabel(v);
+        callFrame->uncheckedR(size).jsValue().updateLabel(programCounter.Head());
+        // end modified code
         vPC += OPCODE_LENGTH(op_get_pnames);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_next_pname) {
+    DEFINE_OPCODE(op_next_pname) { // TODO: see how this needs instrumentation
         /* next_pname dst(r) base(r) i(n) size(n) iter(r) target(offset)
 
            Copies the next name from the property name list in
@@ -4958,7 +5035,12 @@ skip_id_custom_self:
         */
 
         int ex = vPC[1].u.operand;
-        exceptionValue = callFrame->r(ex).jsValue();
+        //exceptionValue = callFrame->r(ex).jsValue();
+        // begin modified code
+        JSValue result = callFrame->r(ex).jsValue();
+        result.updateLabel(programCounter.Head());
+        exceptionValue = result;
+        // end modified code
 
         handler = throwException(callFrame, exceptionValue, vPC - codeBlock->instructions().begin());
         if (!handler)
@@ -4968,7 +5050,7 @@ skip_id_custom_self:
         vPC = codeBlock->instructions().begin() + handler->target;
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_throw_reference_error) {
+    DEFINE_OPCODE(op_throw_reference_error) { //TODO: decide if we need to give exceptionValue the same label as message
         /* op_throw_reference_error message(k)
 
            Constructs a new reference Error instance using the
@@ -4979,7 +5061,7 @@ skip_id_custom_self:
         exceptionValue = JSValue(createReferenceError(callFrame, message));
         goto vm_throw;
     }
-    DEFINE_OPCODE(op_end) { //instrument - pop the stack (?)
+    DEFINE_OPCODE(op_end) { //instrument - pop the stack (?) //TODO: figure out if we need to pop
         /* end result(r)
            
            Return register result as the value of a global or eval
