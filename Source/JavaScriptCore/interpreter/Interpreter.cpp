@@ -1533,9 +1533,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         
+        // begin modified code
 		JSValue result = JSValue(constructEmptyObject(callFrame));
 		result.updateLabel(programCounter.Head());
 		callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_new_object);
         NEXT_INSTRUCTION();
@@ -1553,9 +1555,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int argCount = vPC[3].u.operand;
         ArgList args(callFrame->registers() + firstArg, argCount);
 
+        // begin modified code
 		JSValue result = JSValue(constructArray(callFrame, args));
 		result.updateLabel(programCounter.Head());
 		callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_new_array);
         NEXT_INSTRUCTION();
@@ -1574,9 +1578,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             goto vm_throw;
         }
 		
+        // begin modified code
         JSValue result = JSValue(new (globalData) RegExpObject(callFrame->lexicalGlobalObject(), callFrame->scopeChain()->globalObject->regExpStructure(), regExp));
 		result.updateLabel(programCounter.Head());
 		callFrame->uncheckedR(dst) = result;
+        // end modified code
 		
         vPC += OPCODE_LENGTH(op_new_regexp);
         NEXT_INSTRUCTION();
@@ -1594,13 +1600,13 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 		callFrame->uncheckedR(dst) = callFrame->r(src);
 		*/
 		
-		// our code
+        // begin modified code
         int dst = vPC[1].u.operand;
 		JSValue src = callFrame->r(vPC[2].u.operand).jsValue(); // pull result out to JSValue for labeling
 		src.updateLabel(programCounter.Head());
 		
 		callFrame->uncheckedR(dst) = src;
-		//back to original
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_mov);
         NEXT_INSTRUCTION();
@@ -1615,6 +1621,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        // begin modified code
         if (src1.isInt32() && src2.isInt32()) {
             JSValue result = jsBoolean(src1.asInt32() == src2.asInt32());
             result.label = src1.label.Join(src2.label);
@@ -1627,6 +1634,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_eq);
         NEXT_INSTRUCTION();
@@ -1641,18 +1649,22 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
 
         if (src.isUndefinedOrNull()) {
+            // begin modified code
             JSValue result = jsBoolean(true);
             result.updateLabel(src);
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
+            // end modified code
             vPC += OPCODE_LENGTH(op_eq_null);
             NEXT_INSTRUCTION();
         }
         
+        // begin modified code
         JSValue result = jsBoolean(src.isCell() && src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
         result.updateLabel(src);
         result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
+        // end modified code
         vPC += OPCODE_LENGTH(op_eq_null);
         NEXT_INSTRUCTION();
     }
@@ -1667,6 +1679,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         if (src1.isInt32() && src2.isInt32()) {
+            // begin modified code
             JSValue result = jsBoolean(src1.asInt32() != src2.asInt32());
             result.updateLabel(src1);
             result.updateLabel(src2);
@@ -1679,6 +1692,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(src2);
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
+            // end modified code
         }
 
         vPC += OPCODE_LENGTH(op_neq);
@@ -1694,18 +1708,22 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
 
         if (src.isUndefinedOrNull()) {
+            // begin modified code
             JSValue result = jsBoolean(false);
             result.updateLabel(src);
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
+            // end modified code
             vPC += OPCODE_LENGTH(op_neq_null);
             NEXT_INSTRUCTION();
         }
         
+        // begin modified code
         JSValue result = jsBoolean(!src.isCell() || !src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
         result.updateLabel(src);
         result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
+        // end modified code
         vPC += OPCODE_LENGTH(op_neq_null);
         NEXT_INSTRUCTION();
     }
@@ -1721,11 +1739,13 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         bool result = JSValue::strictEqual(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+        // begin modified code
         JSValue res = jsBoolean(result);
         res.updateLabel(src1);
         res.updateLabel(src2);
         res.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = res;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_stricteq);
         NEXT_INSTRUCTION();
@@ -1742,11 +1762,13 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         bool result = !JSValue::strictEqual(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+        // begin modified code
         JSValue res = jsBoolean(result);
         res.updateLabel(src1);
         res.updateLabel(src2);
         res.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = res;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_nstricteq);
         NEXT_INSTRUCTION();
@@ -1763,10 +1785,12 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         JSValue result = jsBoolean(jsLess(callFrame, src1, src2));
         CHECK_FOR_EXCEPTION();
+        // begin modified code
         result.updateLabel(src1);
         result.updateLabel(src2);
         result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_less);
         NEXT_INSTRUCTION();
@@ -1783,10 +1807,12 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         JSValue result = jsBoolean(jsLessEq(callFrame, src1, src2));
         CHECK_FOR_EXCEPTION();
+        // begin modified code
         result.updateLabel(src1);
         result.updateLabel(src2);
         result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_lesseq);
         NEXT_INSTRUCTION();
@@ -1799,15 +1825,21 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int srcDst = vPC[1].u.operand;
         JSValue v = callFrame->r(srcDst).jsValue();
-        if (v.isInt32() && v.asInt32() < INT_MAX)
-            callFrame->uncheckedR(srcDst) = jsNumber(v.asInt32() + 1);
-        else {
+        // begin modified code
+        if (v.isInt32() && v.asInt32() < INT_MAX) {
+            // callFrame->uncheckedR(srcDst) = jsNumber(v.asInt32() + 1);
+            JSValue result = jsNumber(v.asInt32() + 1);
+            result.updateLabel(v);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(srcDst) = result;
+        } else {
             JSValue result = jsNumber(v.toNumber(callFrame) + 1);
             CHECK_FOR_EXCEPTION();
             result.updateLabel(v);
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(srcDst) = result;
         }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_pre_inc);
         NEXT_INSTRUCTION();
@@ -1820,15 +1852,21 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int srcDst = vPC[1].u.operand;
         JSValue v = callFrame->r(srcDst).jsValue();
-        if (v.isInt32() && v.asInt32() > INT_MIN)
-            callFrame->uncheckedR(srcDst) = jsNumber(v.asInt32() - 1);
-        else {
+        // begin modified code
+        if (v.isInt32() && v.asInt32() > INT_MIN) {
+            //callFrame->uncheckedR(srcDst) = jsNumber(v.asInt32() - 1);
+            JSValue result = jsNumber(v.asInt32() - 1);
+            result.updateLabel(v);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(srcDst) = result;
+        } else {
             JSValue result = jsNumber(v.toNumber(callFrame) - 1);
             CHECK_FOR_EXCEPTION();
             result.updateLabel(v);
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(srcDst) = result;
         }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_pre_dec);
         NEXT_INSTRUCTION();
@@ -1843,6 +1881,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         int srcDst = vPC[2].u.operand;
         JSValue v = callFrame->r(srcDst).jsValue();
+        // begin modified code
         if (v.isInt32() && v.asInt32() < INT_MAX) {
             JSValue result = jsNumber(v.asInt32() + 1);
             result.updateLabel(v);
@@ -1863,6 +1902,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             number.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = number;
         }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_post_inc);
         NEXT_INSTRUCTION();
@@ -1877,6 +1917,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         int srcDst = vPC[2].u.operand;
         JSValue v = callFrame->r(srcDst).jsValue();
+        // begin modified code
         if (v.isInt32() && v.asInt32() > INT_MIN) {
             JSValue result = jsNumber(v.asInt32() - 1);
             result.updateLabel(v);
@@ -1897,6 +1938,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             number.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = number;
         }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_post_dec);
         NEXT_INSTRUCTION();
@@ -1916,11 +1958,13 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             srcVal.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = srcVal;
         } else {
+            // begin modified code
             JSValue result = srcVal.toJSNumber(callFrame);
             CHECK_FOR_EXCEPTION();
             result.updateLabel(srcVal);
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
+            // end modified code
         }
 
         vPC += OPCODE_LENGTH(op_to_jsnumber);
@@ -1934,6 +1978,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
+        // begin modified code
         if (src.isInt32() && (src.asInt32() & 0x7fffffff)) {// non-zero and no overflow
             JSValue result = jsNumber(-src.asInt32());
             result.updateLabel(src);
@@ -1946,6 +1991,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_negate);
         NEXT_INSTRUCTION();
@@ -1960,6 +2006,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        // begin modified code
         if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | (src2.asInt32() & 0xc0000000))) { // no overflow
             JSValue result = jsNumber(src1.asInt32() + src2.asInt32());
             result.updateLabel(src1);
@@ -1974,6 +2021,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
+        // end modified code
         vPC += OPCODE_LENGTH(op_add);
         NEXT_INSTRUCTION();
     }
@@ -1986,6 +2034,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        // begin modified code
         if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | src2.asInt32() >> 15)) { // no overflow
             JSValue result = jsNumber(src1.asInt32() * src2.asInt32());
             result.updateLabel(src1);
@@ -2000,6 +2049,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_mul);
         NEXT_INSTRUCTION();
@@ -2017,10 +2067,12 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
         JSValue result = jsNumber(dividend.toNumber(callFrame) / divisor.toNumber(callFrame));
         CHECK_FOR_EXCEPTION();
+        // begin modified code
         result.updateLabel(dividend);
         result.updateLabel(divisor);
         result.updateLabel(programCounter.Head());
         callFrame->uncheckedR(dst) = result;
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_div);
         NEXT_INSTRUCTION();
@@ -2039,9 +2091,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         if (dividend.isInt32() && divisor.isInt32() && divisor.asInt32() != 0) {
             JSValue result = jsNumber(dividend.asInt32() % divisor.asInt32());
             ASSERT(result);
+            // begin modified code
             result.updateLabel(dividend);
             result.updateLabel(divisor);
             result.updateLabel(programCounter.Head());
+            // end modified code
             callFrame->uncheckedR(dst) = result;
             vPC += OPCODE_LENGTH(op_mod);
             NEXT_INSTRUCTION();
@@ -2053,9 +2107,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         double d2 = divisor.toNumber(callFrame);
         JSValue result = jsNumber(fmod(d1, d2));
         CHECK_FOR_EXCEPTION();
+        // begin modified code
         result.updateLabel(dividend);
         result.updateLabel(divisor);
         result.updateLabel(programCounter.Head());
+        // end modified code
         callFrame->uncheckedR(dst) = result;
         vPC += OPCODE_LENGTH(op_mod);
         NEXT_INSTRUCTION();
@@ -2070,6 +2126,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        // begin modified code
         if (src1.isInt32() && src2.isInt32() && !(src1.asInt32() | (src2.asInt32() & 0xc0000000))) { // no overflow
             JSValue result = jsNumber(src1.asInt32() - src2.asInt32());
             result.updateLabel(src1);
@@ -2084,6 +2141,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             CHECK_FOR_EXCEPTION();
             callFrame->uncheckedR(dst) = result;
         }
+        // end modified code
         vPC += OPCODE_LENGTH(op_sub);
         NEXT_INSTRUCTION();
     }
@@ -2099,6 +2157,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue shift = callFrame->r(vPC[3].u.operand).jsValue();
 
         if (val.isInt32() && shift.isInt32()) {
+        // begin modified code
             JSValue result = jsNumber(val.asInt32() << (shift.asInt32() & 0x1f));
             result.updateLabel(val);
             result.updateLabel(shift);
@@ -2110,6 +2169,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(val);
             result.updateLabel(shift);
             result.updateLabel(programCounter.Head());
+        // end modified code
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2128,6 +2188,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue shift = callFrame->r(vPC[3].u.operand).jsValue();
 
         if (val.isInt32() && shift.isInt32()) {
+        // begin modified code
             JSValue result = jsNumber(val.asInt32() >> (shift.asInt32() & 0x1f));
             result.updateLabel(val);
             result.updateLabel(shift);
@@ -2135,10 +2196,11 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             callFrame->uncheckedR(dst) = result;
         } else {
             JSValue result = jsNumber((val.toInt32(callFrame)) >> (shift.toUInt32(callFrame) & 0x1f));
+            CHECK_FOR_EXCEPTION();
             result.updateLabel(val);
             result.updateLabel(shift);
             result.updateLabel(programCounter.Head());
-            CHECK_FOR_EXCEPTION();
+        // end modified code
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2156,6 +2218,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue val = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue shift = callFrame->r(vPC[3].u.operand).jsValue();
         if (val.isUInt32() && shift.isInt32()) {
+        // begin modified code
             JSValue result = jsNumber(val.asInt32() >> (shift.asInt32() & 0x1f));
             result.updateLabel(val);
             result.updateLabel(shift);
@@ -2167,6 +2230,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(val);
             result.updateLabel(shift);
             result.updateLabel(programCounter.Head());
+        // end modified code
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2183,6 +2247,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        // begin modified code
         if (src1.isInt32() && src2.isInt32()) {
             JSValue result = jsNumber(src1.asInt32() & src2.asInt32());
             result.updateLabel(src1);
@@ -2195,6 +2260,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(src1);
             result.updateLabel(src2);
             result.updateLabel(programCounter.Head());
+        // end modified code
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2211,6 +2277,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        // begin modified code
         if (src1.isInt32() && src2.isInt32()) {
             JSValue result = jsNumber(src1.asInt32() ^ src2.asInt32());
             result.updateLabel(src1);
@@ -2223,6 +2290,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(src1);
             result.updateLabel(src2);
             result.updateLabel(programCounter.Head());
+        // end modified code
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2239,6 +2307,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        // begin modified code
         if (src1.isInt32() && src2.isInt32()) {
             JSValue result = jsNumber(src1.asInt32() | src2.asInt32());
             result.updateLabel(src1);
@@ -2251,6 +2320,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             result.updateLabel(src1);
             result.updateLabel(src2);
             result.updateLabel(programCounter.Head());
+        // end modified code
             callFrame->uncheckedR(dst) = result;
         }
 
@@ -2265,6 +2335,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
+        // begin modified code
         if (src.isInt32()) {
             JSValue result = jsNumber(~src.asInt32());
             result.updateLabel(src);
@@ -2275,6 +2346,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             CHECK_FOR_EXCEPTION();
             result.updateLabel(src);
             result.updateLabel(programCounter.Head());
+        // end modified code
             callFrame->uncheckedR(dst) = result;
         }
         vPC += OPCODE_LENGTH(op_bitnot);
@@ -2290,14 +2362,16 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue result = jsBoolean(!src.toBoolean(callFrame));
         CHECK_FOR_EXCEPTION();
+        // begin modified code
         result.updateLabel(src);
         result.updateLabel(programCounter.Head());
+        // end modified code
         callFrame->uncheckedR(dst) = result;
 
         vPC += OPCODE_LENGTH(op_not);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_check_has_instance) { //instrument - output -- this doesn't have output, it just throws an exception sometimes, and we aren't doing anything with exceptions yet
+    DEFINE_OPCODE(op_check_has_instance) { //instrument - output -- this doesn't have output, it just throws an exception sometimes, and we aren't doing anything with exceptions yet // TODO
         /* check_has_instance constructor(r)
 
            Check 'constructor' is an object with the internal property
