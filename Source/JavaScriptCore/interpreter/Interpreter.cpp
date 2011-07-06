@@ -3432,7 +3432,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_put_by_id_generic);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_del_by_id) { //instrument - context -- TODO: Figure out how to do this
+    DEFINE_OPCODE(op_del_by_id) { //instrument - context
         /* del_by_id dst(r) base(r) property(id)
 
            Converts register base to Object, deletes the property
@@ -3452,7 +3452,12 @@ skip_id_custom_self:
             goto vm_throw;
         }
         CHECK_FOR_EXCEPTION();
-        callFrame->uncheckedR(dst) = jsBoolean(result);
+        //callFrame->uncheckedR(dst) = jsBoolean(result);
+        // begin modified code
+        JSValue res = jsBoolean(result);
+        res.updateLabel(programCounter.Head());
+        callFrame->uncheckedR(dst) = res;
+        // end modified code
         vPC += OPCODE_LENGTH(op_del_by_id);
         NEXT_INSTRUCTION();
     }
@@ -3485,7 +3490,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_get_by_pname);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_arguments_length) { // -- TODO: Figure out how to do this
+    DEFINE_OPCODE(op_get_arguments_length) {
         int dst = vPC[1].u.operand;
         int argumentsRegister = vPC[2].u.operand;
         int property = vPC[3].u.operand;
@@ -3495,9 +3500,20 @@ skip_id_custom_self:
             PropertySlot slot(arguments);
             JSValue result = arguments.get(callFrame, ident, slot);
             CHECK_FOR_EXCEPTION();
+        //    callFrame->uncheckedR(dst) = result;
+        // } else
+        //    callFrame->uncheckedR(dst) = jsNumber(callFrame->argumentCount());
+        // begin modified code
+            result.updateLabel(arguments);
+            result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
-        } else
-            callFrame->uncheckedR(dst) = jsNumber(callFrame->argumentCount());
+        } else {
+            JSValue result = jsNumber(callFrame->argumentCount());
+            result.updateLabel(arguments);
+            result.updateLabel(programCounter.Head());
+            callFrame->uncheckedR(dst) = result;
+        }
+        // end modified code
 
         vPC += OPCODE_LENGTH(op_get_arguments_length);
         NEXT_INSTRUCTION();
@@ -3869,7 +3885,7 @@ skip_id_custom_self:
         int target = vPC[3].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
         // begin modified code
-        programCounter.Push(srcValue.label, (long) vPC);
+        //programCounter.Push(srcValue.label, (long) vPC); //commented because I'm unsure if this opcode will have a corresponding joint
         // end modified code
         if (srcValue != vPC[2].u.jsCell.get()) {
             vPC += target;
@@ -4128,9 +4144,10 @@ skip_id_custom_self:
         int func = vPC[2].u.operand;
         int shouldCheck = vPC[3].u.operand;
         ASSERT(codeBlock->codeType() != FunctionCode || !codeBlock->needsFullScopeChain() || callFrame->r(codeBlock->activationRegister()).jsValue());
+        //if (!shouldCheck || !callFrame->r(dst).jsValue())
+        //    callFrame->uncheckedR(dst) = JSValue(codeBlock->functionDecl(func)->make(callFrame, callFrame->scopeChain()));
 		// begin modified code
         if (!shouldCheck || !callFrame->r(dst).jsValue()) {
-            //callFrame->uncheckedR(dst) = JSValue(codeBlock->functionDecl(func)->make(callFrame, callFrame->scopeChain()));
             JSValue result = JSValue(codeBlock->functionDecl(func)->make(callFrame, callFrame->scopeChain()));
             // TODO: Handle label from func
             result.updateLabel(programCounter.Head());
@@ -4138,7 +4155,6 @@ skip_id_custom_self:
 		}
         // end modified code
 			
-
         vPC += OPCODE_LENGTH(op_new_func);
         NEXT_INSTRUCTION();
     }
@@ -4588,7 +4604,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_enter);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_create_activation) { // TODO: establish if this needs instrumentation
+    DEFINE_OPCODE(op_create_activation) {
         /* create_activation dst(r)
 
            If the activation object for this callframe has not yet been created,
@@ -4598,7 +4614,12 @@ skip_id_custom_self:
         int activationReg = vPC[1].u.operand;
         if (!callFrame->r(activationReg).jsValue()) {
             JSActivation* activation = new (globalData) JSActivation(callFrame, static_cast<FunctionExecutable*>(codeBlock->ownerExecutable()));
-            callFrame->r(activationReg) = JSValue(activation);
+            //callFrame->r(activationReg) = JSValue(activation);
+            // begin modified code
+            JSValue result = JSValue(activation);
+            result.updateLabel(programCounter.Head());
+            callFrame->r(activationReg) = result;
+            // end modified code
             callFrame->setScopeChain(callFrame->scopeChain()->push(activation));
         }
         vPC += OPCODE_LENGTH(op_create_activation);
@@ -5050,7 +5071,7 @@ skip_id_custom_self:
         vPC = codeBlock->instructions().begin() + handler->target;
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_throw_reference_error) { //TODO: decide if we need to give exceptionValue the same label as message
+    DEFINE_OPCODE(op_throw_reference_error) { //TODO: decide if we need to give exceptionValue the same label as message. this depends on how we handle exceptions (if at all...)
         /* op_throw_reference_error message(k)
 
            Constructs a new reference Error instance using the
