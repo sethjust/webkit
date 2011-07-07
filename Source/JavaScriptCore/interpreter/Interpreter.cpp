@@ -27,6 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//defines for debugging label propogation
+#define LDEBUG 1
+#define JPRINT(msg) printf("%s at %lx. PC has length %d and head %lx\n", msg, (long)vPC, programCounter.Len(), programCounter.Head().Val());
+//end debugging defines
+
 #include "config.h"
 #include "Interpreter.h"
 
@@ -3794,6 +3799,10 @@ skip_id_custom_self:
 		Dummy opcode to enable proper program counter behavior
 		*/
         programCounter.Pop();
+#if LDEBUG
+        JPRINT("joining");
+		//printf("joining. PC has len %d\n", programCounter.Len());
+#endif
 		vPC += OPCODE_LENGTH(op_joint);
 		NEXT_INSTRUCTION();
 	}
@@ -3828,6 +3837,9 @@ skip_id_custom_self:
         JSValue v = callFrame->r(cond).jsValue();
         if (!(programCounter.Loc() == (long)vPC))
             programCounter.Push(v.label, (long) vPC);
+#if LDEBUG
+        JPRINT("looping if true");
+#endif
         if (v.toBoolean(callFrame)) {
         // end modified code
             vPC += target;
@@ -3853,6 +3865,9 @@ skip_id_custom_self:
         JSValue v = callFrame->r(cond).jsValue();
         if (!(programCounter.Loc() == (long)vPC))
             programCounter.Push(v.label, (long) vPC);
+#if LDEBUG
+        JPRINT("looping if false");
+#endif
         if (!v.toBoolean(callFrame)) {
         // end modified code
             vPC += target;
@@ -3874,6 +3889,9 @@ skip_id_custom_self:
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
         programCounter.Push(v.label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if true");
+#endif
         if (v.toBoolean(callFrame)) {
         // end modified code
         //if (callFrame->r(cond).jsValue().toBoolean(callFrame)) {
@@ -3895,6 +3913,9 @@ skip_id_custom_self:
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
         programCounter.Push(v.label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if false");
+#endif
         if (!v.toBoolean(callFrame)) {
         // end modified code
         //if (!callFrame->r(cond).jsValue().toBoolean(callFrame)) {
@@ -3917,6 +3938,9 @@ skip_id_custom_self:
         
         // begin modified code
         programCounter.Push(srcValue.label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if null");
+#endif
         // end modified code
         
         if (srcValue.isUndefinedOrNull() || (srcValue.isCell() && srcValue.asCell()->structure()->typeInfo().masqueradesAsUndefined())) {
@@ -3939,6 +3963,9 @@ skip_id_custom_self:
 
         // begin modified code
         programCounter.Push(srcValue.label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if not null");
+#endif
         // end modified code
 
         if (!srcValue.isUndefinedOrNull() && (!srcValue.isCell() || !srcValue.asCell()->structure()->typeInfo().masqueradesAsUndefined())) {
@@ -3990,6 +4017,9 @@ skip_id_custom_self:
         // begin modified code
         if (!(programCounter.Loc() == (long)vPC))
             programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("looping if less");
+#endif
         // end modified code
         
         if (result) {
@@ -4022,6 +4052,9 @@ skip_id_custom_self:
         // begin modified code
         if (!(programCounter.Loc() == (long)vPC))
             programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("looping if less or eq");
+#endif
         // end modified code
         
         if (result) {
@@ -4050,6 +4083,9 @@ skip_id_custom_self:
        
         // begin modified code
         programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if not less");
+#endif
         // end modified code
         
         if (!result) {
@@ -4077,6 +4113,9 @@ skip_id_custom_self:
        
         // begin modified code
         programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if less");
+#endif
         // end modified code
         
         if (result) {
@@ -4104,6 +4143,9 @@ skip_id_custom_self:
        
         // begin modified code
         programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if not less or eq");
+#endif
         // end modified code
         
         if (!result) {
@@ -4131,6 +4173,9 @@ skip_id_custom_self:
        
         // begin modified code
         programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if less or eq");
+#endif
         // end modified code
         
         if (result) {
