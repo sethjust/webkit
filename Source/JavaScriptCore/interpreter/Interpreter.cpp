@@ -4186,7 +4186,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_jlesseq);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_imm) { // TODO
+    DEFINE_OPCODE(op_switch_imm) {
         /* switch_imm tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a range checked switch on the scrutinee value, using
@@ -4208,9 +4208,17 @@ skip_id_custom_self:
             else
                 vPC += defaultOffset;
         }
+
+        // begin modified code
+        programCounter.Push(scrutinee.label, (long) vPC);
+#if LDEBUG
+        JPRINT("switching");
+#endif
+        // end modified code
+
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_char) { // TODO
+    DEFINE_OPCODE(op_switch_char) {
         /* switch_char tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a range checked switch on the scrutinee value, using
@@ -4231,9 +4239,17 @@ skip_id_custom_self:
             else
                 vPC += codeBlock->characterSwitchJumpTable(tableIndex).offsetForValue(value->characters()[0], defaultOffset);
         }
+
+        // begin modified code
+        programCounter.Push(scrutinee.label, (long) vPC);
+#if LDEBUG
+        JPRINT("switching");
+#endif
+        // end modified code
+
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_string) { // TODO
+    DEFINE_OPCODE(op_switch_string) {
         /* switch_string tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a sparse hashmap based switch on the value in the scrutinee
@@ -4249,6 +4265,14 @@ skip_id_custom_self:
             vPC += defaultOffset;
         else 
             vPC += codeBlock->stringSwitchJumpTable(tableIndex).offsetForValue(asString(scrutinee)->value(callFrame).impl(), defaultOffset);
+
+        // begin modified code
+        programCounter.Push(scrutinee.label, (long) vPC);
+#if LDEBUG
+        JPRINT("switching");
+#endif
+        // end modified code
+
         NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_new_func) { //instrument - context

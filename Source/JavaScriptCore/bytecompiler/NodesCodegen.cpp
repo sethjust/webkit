@@ -1858,13 +1858,14 @@ RegisterID* CaseBlockNode::emitBytecodeForBlock(BytecodeGenerator& generator, Re
     }
     if (!m_defaultClause)
         generator.emitLabel(defaultLabel.get());
-
+	
     ASSERT(i == labelVector.size());
     if (switchType != SwitchInfo::SwitchNone) {
         ASSERT(labelVector.size() == literalVector.size());
         generator.endSwitch(labelVector.size(), labelVector.data(), literalVector.data(), defaultLabel.get(), min_num, max_num);
     }
-    return result;
+	
+	return result;
 }
 
 // ------------------------------ SwitchNode -----------------------------------
@@ -1877,9 +1878,14 @@ RegisterID* SwitchNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
 
     RefPtr<RegisterID> r0 = generator.emitNode(m_expr);
     RegisterID* r1 = m_block->emitBytecodeForBlock(generator, r0.get(), dst);
-
+	
     generator.emitLabel(scope->breakTarget());
-    return r1;
+
+    // start our code
+	generator.emitJoint();
+	// end our code
+	
+	return r1;
 }
 
 // ------------------------------ LabelNode ------------------------------------
