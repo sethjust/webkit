@@ -18,12 +18,14 @@ namespace JSC {
 	
 	class ProgramCounter {
 		PCNode *node; // current node
+		int len;
 	public:
 		ProgramCounter(); // constructor
 		void Push(JSLabel, long); // push node to stack
 		void Pop(); // remove and return head
 		JSLabel Head(); // return head
 		long Loc();
+		int Len();
 	};
 }
 

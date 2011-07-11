@@ -16,12 +16,15 @@ namespace JSC {
 	}
 	
 	void ProgramCounter::Push(JSLabel l, long i) {
+		// TODO: have this join labels appropriately
 		node = new PCNode(node, l, i);
+		len++;
 	}
 	
 	void ProgramCounter::Pop() {
 		PCNode *temp = node;
 		node = temp->Next();
+		len--;
 	}
 	
 	JSLabel ProgramCounter::Head() {
@@ -30,5 +33,9 @@ namespace JSC {
 	
 	long ProgramCounter::Loc() {
 		return node->Loc();
+	}
+	
+	int ProgramCounter::Len(){
+		return len;
 	}
 }

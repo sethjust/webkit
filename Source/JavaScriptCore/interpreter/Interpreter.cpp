@@ -27,6 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//defines for debugging label propogation
+#define LDEBUG 1
+#define JPRINT(msg) printf("%s at %lx. PC has length %d and head %lx\n", msg, (long)vPC, programCounter.Len(), programCounter.Head().Val());
+//end debugging defines
+
 #include "config.h"
 #include "Interpreter.h"
 
@@ -3803,11 +3808,24 @@ skip_id_custom_self:
 	
 	//start our code
 	DEFINE_OPCODE(op_joint) {
-		/* joint
+		/* joint from(offset)
 		 
 		Dummy opcode to enable proper program counter behavior
 		*/
-        programCounter.Pop();
+		int from = vPC[1].u.operand;
+				
+		// Pop from the stack until we get the elem that we're joining from
+		while (1) {
+			bool br = (programCounter.Loc() == (long) &vPC[from]);
+			programCounter.Pop();
+			if (br) { break; }
+		}
+		
+#if LDEBUG
+        //JPRINT("joining");
+		printf("joining at %lx (from %lx). PC has len %d and head %ld\n", (long) vPC, (long) &vPC[from], programCounter.Len(), programCounter.Head().Val());
+#endif
+		
 		vPC += OPCODE_LENGTH(op_joint);
 		NEXT_INSTRUCTION();
 	}
@@ -3842,6 +3860,9 @@ skip_id_custom_self:
         JSValue v = callFrame->r(cond).jsValue();
         if (!(programCounter.Loc() == (long)vPC))
             programCounter.Push(v.label, (long) vPC);
+#if LDEBUG
+        JPRINT("looping if true");
+#endif
         if (v.toBoolean(callFrame)) {
         // end modified code
             vPC += target;
@@ -3867,6 +3888,9 @@ skip_id_custom_self:
         JSValue v = callFrame->r(cond).jsValue();
         if (!(programCounter.Loc() == (long)vPC))
             programCounter.Push(v.label, (long) vPC);
+#if LDEBUG
+        JPRINT("looping if false");
+#endif
         if (!v.toBoolean(callFrame)) {
         // end modified code
             vPC += target;
@@ -3888,6 +3912,9 @@ skip_id_custom_self:
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
         programCounter.Push(v.label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if true");
+#endif
         if (v.toBoolean(callFrame)) {
         // end modified code
         //if (callFrame->r(cond).jsValue().toBoolean(callFrame)) {
@@ -3909,6 +3936,9 @@ skip_id_custom_self:
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
         programCounter.Push(v.label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if false");
+#endif
         if (!v.toBoolean(callFrame)) {
         // end modified code
         //if (!callFrame->r(cond).jsValue().toBoolean(callFrame)) {
@@ -3931,6 +3961,9 @@ skip_id_custom_self:
         
         // begin modified code
         programCounter.Push(srcValue.label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if null");
+#endif
         // end modified code
         
         if (srcValue.isUndefinedOrNull() || (srcValue.isCell() && srcValue.asCell()->structure()->typeInfo().masqueradesAsUndefined())) {
@@ -3953,6 +3986,9 @@ skip_id_custom_self:
 
         // begin modified code
         programCounter.Push(srcValue.label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if not null");
+#endif
         // end modified code
 
         if (!srcValue.isUndefinedOrNull() && (!srcValue.isCell() || !srcValue.asCell()->structure()->typeInfo().masqueradesAsUndefined())) {
@@ -4004,6 +4040,9 @@ skip_id_custom_self:
         // begin modified code
         if (!(programCounter.Loc() == (long)vPC))
             programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("looping if less");
+#endif
         // end modified code
         
         if (result) {
@@ -4036,6 +4075,9 @@ skip_id_custom_self:
         // begin modified code
         if (!(programCounter.Loc() == (long)vPC))
             programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("looping if less or eq");
+#endif
         // end modified code
         
         if (result) {
@@ -4064,6 +4106,9 @@ skip_id_custom_self:
        
         // begin modified code
         programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if not less");
+#endif
         // end modified code
         
         if (!result) {
@@ -4091,6 +4136,9 @@ skip_id_custom_self:
        
         // begin modified code
         programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if less");
+#endif
         // end modified code
         
         if (result) {
@@ -4118,6 +4166,9 @@ skip_id_custom_self:
        
         // begin modified code
         programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if not less or eq");
+#endif
         // end modified code
         
         if (!result) {
@@ -4145,6 +4196,9 @@ skip_id_custom_self:
        
         // begin modified code
         programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+#if LDEBUG
+        JPRINT("jumping if less or eq");
+#endif
         // end modified code
         
         if (result) {
@@ -4155,7 +4209,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_jlesseq);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_imm) { // TODO
+    DEFINE_OPCODE(op_switch_imm) {
         /* switch_imm tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a range checked switch on the scrutinee value, using
@@ -4167,6 +4221,14 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
+				
+        // begin modified code
+        programCounter.Push(scrutinee.label, (long) vPC);
+#if LDEBUG
+        JPRINT("switching");
+#endif
+        // end modified code
+		
         if (scrutinee.isInt32())
             vPC += codeBlock->immediateSwitchJumpTable(tableIndex).offsetForValue(scrutinee.asInt32(), defaultOffset);
         else {
@@ -4177,9 +4239,10 @@ skip_id_custom_self:
             else
                 vPC += defaultOffset;
         }
+
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_char) { // TODO
+    DEFINE_OPCODE(op_switch_char) {
         /* switch_char tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a range checked switch on the scrutinee value, using
@@ -4191,6 +4254,14 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
+		
+        // begin modified code
+        programCounter.Push(scrutinee.label, (long) vPC);
+#if LDEBUG
+        JPRINT("switching");
+#endif
+        // end modified code
+		
         if (!scrutinee.isString())
             vPC += defaultOffset;
         else {
@@ -4200,9 +4271,10 @@ skip_id_custom_self:
             else
                 vPC += codeBlock->characterSwitchJumpTable(tableIndex).offsetForValue(value->characters()[0], defaultOffset);
         }
+
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_switch_string) { // TODO
+    DEFINE_OPCODE(op_switch_string) {
         /* switch_string tableIndex(n) defaultOffset(offset) scrutinee(r)
 
            Performs a sparse hashmap based switch on the value in the scrutinee
@@ -4214,10 +4286,19 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
+
+        // begin modified code
+        programCounter.Push(scrutinee.label, (long) vPC);
+#if LDEBUG
+        JPRINT("switching");
+#endif
+        // end modified code
+		
         if (!scrutinee.isString())
             vPC += defaultOffset;
         else 
             vPC += codeBlock->stringSwitchJumpTable(tableIndex).offsetForValue(asString(scrutinee)->value(callFrame).impl(), defaultOffset);
+
         NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_new_func) { //instrument - context
@@ -5062,6 +5143,14 @@ skip_id_custom_self:
         int size = vPC[4].u.operand;
         int iter = vPC[5].u.operand;
         int target = vPC[6].u.operand;
+		
+		// begin modified code
+		if (!(programCounter.Loc() == (long)vPC))
+            programCounter.Push(callFrame->r(base).jsValue().label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping to next pname");
+#endif
+		// end modified code
 
         JSPropertyNameIterator* it = callFrame->r(iter).propertyNameIterator();
         while (callFrame->r(i).i() != callFrame->r(size).i()) {

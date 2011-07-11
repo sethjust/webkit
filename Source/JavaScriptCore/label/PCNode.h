@@ -17,7 +17,7 @@ namespace JSC {
 	class PCNode {
 		PCNode *node; // pointer to previous node
 		JSLabel value; // node value
-		int loc;
+		long loc;
 		
 	public:
 		PCNode(PCNode*, JSLabel, long); // constructor
