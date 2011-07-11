@@ -595,6 +595,10 @@
 		C21CDA3E13B4EC35000D5DAC /* ProgramCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */; };
 		C21CDA4913B5480C000D5DAC /* Generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3813B4E5DC000D5DAC /* Generator.cpp */; };
 		C21CDA4A13B54815000D5DAC /* ProgramCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */; };
+		C2ADA50A13C78B4F00C97DBD /* URLEntry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2ADA50613C78B4F00C97DBD /* URLEntry.cpp */; };
+		C2ADA50B13C78B4F00C97DBD /* URLEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = C2ADA50713C78B4F00C97DBD /* URLEntry.h */; };
+		C2ADA50C13C78B4F00C97DBD /* URLMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2ADA50813C78B4F00C97DBD /* URLMap.cpp */; };
+		C2ADA50D13C78B4F00C97DBD /* URLMap.h in Headers */ = {isa = PBXBuildFile; fileRef = C2ADA50913C78B4F00C97DBD /* URLMap.h */; };
 		C2B56D9913BA32040026B371 /* PCNode.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B56D9713BA32040026B371 /* PCNode.h */; };
 		C2B56D9A13BA32040026B371 /* PCNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2B56D9813BA32040026B371 /* PCNode.cpp */; };
 		C2B56E4313BA46EA0026B371 /* PCNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2B56D9813BA32040026B371 /* PCNode.cpp */; };
@@ -1261,6 +1265,10 @@
 		C21CDA3813B4E5DC000D5DAC /* Generator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Generator.cpp; sourceTree = "<group>"; };
 		C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramCounter.h; sourceTree = "<group>"; };
 		C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProgramCounter.cpp; sourceTree = "<group>"; };
+		C2ADA50613C78B4F00C97DBD /* URLEntry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = URLEntry.cpp; sourceTree = "<group>"; };
+		C2ADA50713C78B4F00C97DBD /* URLEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLEntry.h; sourceTree = "<group>"; };
+		C2ADA50813C78B4F00C97DBD /* URLMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = URLMap.cpp; sourceTree = "<group>"; };
+		C2ADA50913C78B4F00C97DBD /* URLMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLMap.h; sourceTree = "<group>"; };
 		C2B56D9713BA32040026B371 /* PCNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PCNode.h; sourceTree = "<group>"; };
 		C2B56D9813BA32040026B371 /* PCNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PCNode.cpp; sourceTree = "<group>"; };
 		D21202280AD4310C00ED79B6 /* DateConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = DateConversion.cpp; sourceTree = "<group>"; };
@@ -2214,6 +2222,10 @@
 		F9E93A0C13B3B3450070D745 /* label */ = {
 			isa = PBXGroup;
 			children = (
+				C2ADA50613C78B4F00C97DBD /* URLEntry.cpp */,
+				C2ADA50713C78B4F00C97DBD /* URLEntry.h */,
+				C2ADA50813C78B4F00C97DBD /* URLMap.cpp */,
+				C2ADA50913C78B4F00C97DBD /* URLMap.h */,
 				F9E93A0D13B3B3450070D745 /* JSLabel.cpp */,
 				F9E93A0E13B3B3450070D745 /* JSLabel.h */,
 				C21CDA3713B4E5DC000D5DAC /* Generator.h */,
@@ -2606,6 +2618,8 @@
 				C21CDA3913B4E5DC000D5DAC /* Generator.h in Headers */,
 				C21CDA3D13B4EC35000D5DAC /* ProgramCounter.h in Headers */,
 				C2B56D9913BA32040026B371 /* PCNode.h in Headers */,
+				C2ADA50B13C78B4F00C97DBD /* URLEntry.h in Headers */,
+				C2ADA50D13C78B4F00C97DBD /* URLMap.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3058,6 +3072,8 @@
 				C21CDA3A13B4E5DC000D5DAC /* Generator.cpp in Sources */,
 				C21CDA3E13B4EC35000D5DAC /* ProgramCounter.cpp in Sources */,
 				C2B56D9A13BA32040026B371 /* PCNode.cpp in Sources */,
+				C2ADA50A13C78B4F00C97DBD /* URLEntry.cpp in Sources */,
+				C2ADA50C13C78B4F00C97DBD /* URLMap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

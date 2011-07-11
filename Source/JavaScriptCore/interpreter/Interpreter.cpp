@@ -65,6 +65,8 @@
 #include <stdio.h>
 #include <wtf/Threading.h>
 
+#include "URLMap.h"
+
 #if ENABLE(JIT)
 #include "JIT.h"
 #endif
@@ -763,6 +765,10 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
     ASSERT(codeBlock->m_numParameters == 1); // 1 parameter for 'this'.
     newCallFrame->init(codeBlock, 0, scopeChain, CallFrame::noCaller(), codeBlock->m_numParameters, 0);
     newCallFrame->uncheckedR(newCallFrame->hostThisRegister()) = JSValue(thisObj);
+	
+	// -----------Instrumentation----------- //
+	URLMap::urlmap().put(program->sourceURL().utf8().data());
+	// ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
     if (*profiler)
@@ -837,6 +843,10 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
         }
 
         newCallFrame->init(newCodeBlock, 0, callDataScopeChain, callFrame->addHostCallFrameFlag(), argCount, function);
+		
+		// -----------Instrumentation----------- //
+		URLMap::urlmap().put(static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data());
+		// ------------------------------------- //
 
         Profiler** profiler = Profiler::enabledProfilerReference();
         if (*profiler)
@@ -1145,6 +1155,10 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
     ASSERT(codeBlock->m_numParameters == 1); // 1 parameter for 'this'.
     newCallFrame->init(codeBlock, 0, scopeChain, callFrame->addHostCallFrameFlag(), codeBlock->m_numParameters, 0);
     newCallFrame->uncheckedR(newCallFrame->hostThisRegister()) = JSValue(thisObj);
+	
+	// -----------Instrumentation----------- //
+	URLMap::urlmap().put(eval->sourceURL().utf8().data());
+	// ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
     if (*profiler)
