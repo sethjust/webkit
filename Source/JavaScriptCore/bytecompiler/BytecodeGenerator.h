@@ -225,6 +225,15 @@ namespace JSC {
             else
                 emitThrowExpressionTooDeepException();
         }
+		
+		void emitNodeInConditionContext(ExpressionNode* n, Label* trueTarget, Label* falseTarget, bool fallThroughMeansTrue, RefPtr<Label> jumpLab)
+        {
+            addLineInfo(n->lineNo());
+            if (m_stack.recursionCheck())
+                n->emitBytecodeInConditionContext(*this, trueTarget, falseTarget, fallThroughMeansTrue, jumpLab);
+            else
+                emitThrowExpressionTooDeepException();
+        }
 
         void emitExpressionInfo(unsigned divot, unsigned startOffset, unsigned endOffset)
         {

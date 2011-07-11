@@ -5129,6 +5129,14 @@ skip_id_custom_self:
         int size = vPC[4].u.operand;
         int iter = vPC[5].u.operand;
         int target = vPC[6].u.operand;
+		
+		// begin modified code
+		if (!(programCounter.Loc() == (long)vPC))
+            programCounter.Push(callFrame->r(base).jsValue().label, (long) vPC);
+#if LDEBUG
+        JPRINT("jumping to next pname");
+#endif
+		// end modified code
 
         JSPropertyNameIterator* it = callFrame->r(iter).propertyNameIterator();
         while (callFrame->r(i).i() != callFrame->r(size).i()) {
