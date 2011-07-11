@@ -1420,7 +1420,7 @@ RegisterID* IfNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
     generator.emitLabel(afterThen.get());
 	
 	// start our code
-	generator.emitJoint();
+//	generator.emitJoint();
 	// end our code
 
     // FIXME: This should return the last statement executed so that it can be returned as a Completion.
@@ -1455,7 +1455,7 @@ RegisterID* IfElseNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
     generator.emitLabel(afterElse.get());
 
 	// start our code
-	generator.emitJoint();
+//	generator.emitJoint();
 	// end our code
 
     // FIXME: This should return the last statement executed so that it can be returned as a Completion.
@@ -1487,7 +1487,7 @@ RegisterID* DoWhileNode::emitBytecode(BytecodeGenerator& generator, RegisterID* 
     generator.emitLabel(scope->breakTarget());
 	
 	// start our code
-	generator.emitJoint();
+//	generator.emitJoint();
 	// end our code
 	
     return result.get();
@@ -1519,7 +1519,7 @@ RegisterID* WhileNode::emitBytecode(BytecodeGenerator& generator, RegisterID* ds
     generator.emitLabel(scope->breakTarget());
 	
 	// start our code
-	generator.emitJoint();
+	generator.emitJoint(scope->continueTarget());
 	// end our code
     
     // FIXME: This should return the last statement executed so that it can be returned as a Completion
@@ -1564,7 +1564,7 @@ RegisterID* ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
     generator.emitLabel(scope->breakTarget());
 	
 	// start our code
-	generator.emitJoint();
+//	generator.emitJoint();
 	// end our code
 	
     return result.get();
@@ -1644,7 +1644,7 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator, RegisterID* ds
     generator.emitLabel(scope->breakTarget());
 	
 	// start our code
-	generator.emitJoint();
+//	generator.emitJoint();
 	// end our code
 	
     return dst;
@@ -1882,7 +1882,7 @@ RegisterID* SwitchNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
     generator.emitLabel(scope->breakTarget());
 
     // start our code
-	generator.emitJoint();
+//	generator.emitJoint();
 	// end our code
 	
 	return r1;

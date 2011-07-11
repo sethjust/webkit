@@ -951,7 +951,8 @@ void CodeBlock::dump(ExecState* exec, const Vector<Instruction>::const_iterator&
 			
 		// start our code
 		case op_joint: {
-			printf("[%4d] joint\n", location);
+			int from = (++it)->u.operand;
+			printf("[%4d] joint\t\t %d(<-%d)\n", location, from, location + from);
 			break;
 		}
 		// end our code

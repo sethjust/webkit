@@ -3794,15 +3794,24 @@ skip_id_custom_self:
 	
 	//start our code
 	DEFINE_OPCODE(op_joint) {
-		/* joint
+		/* joint from(offset)
 		 
 		Dummy opcode to enable proper program counter behavior
 		*/
-        programCounter.Pop();
+		int from = vPC[1].u.operand;
+		
+		// Pop from the stack until we get the elem that we're joining from
+		while (1) {
+			bool br = (programCounter.Loc() == (long) &vPC[from]);
+			programCounter.Pop();
+			if (br) { break; }
+		}
+		
 #if LDEBUG
-        JPRINT("joining");
-		//printf("joining. PC has len %d\n", programCounter.Len());
+        //JPRINT("joining");
+		printf("joining at %lx (from %lx). PC has len %d and head %ld\n", (long) vPC, (long) &vPC[from], programCounter.Len(), programCounter.Head().Val());
 #endif
+		
 		vPC += OPCODE_LENGTH(op_joint);
 		NEXT_INSTRUCTION();
 	}

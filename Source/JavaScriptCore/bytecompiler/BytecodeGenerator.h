@@ -344,7 +344,7 @@ namespace JSC {
         PassRefPtr<Label> emitLabel(Label*);
 		
         // start our code
-        void emitJoint();
+        void emitJoint(Label*);
         // end our code
         
         PassRefPtr<Label> emitJump(Label* target);
