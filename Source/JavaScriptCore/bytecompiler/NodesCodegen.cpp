@@ -1405,7 +1405,12 @@ RegisterID* IfNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
 {
     generator.emitDebugHook(WillExecuteStatement, firstLine(), lastLine());
     
-    RefPtr<Label> afterThen = generator.newLabel();
+    RefPtr<Label> afterThen = generator.newLabel();	
+	
+	//start our code
+    RefPtr<Label> beforeIf = generator.newLabel();
+	generator.emitLabel(beforeIf.get());
+	//end our code
 
     if (m_condition->hasConditionContextCodegen()) {
         RefPtr<Label> beforeThen = generator.newLabel();
@@ -1420,7 +1425,7 @@ RegisterID* IfNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
     generator.emitLabel(afterThen.get());
 	
 	// start our code
-//	generator.emitJoint();
+	generator.emitJoint(beforeIf.get());
 	// end our code
 
     // FIXME: This should return the last statement executed so that it can be returned as a Completion.
@@ -1435,7 +1440,12 @@ RegisterID* IfElseNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
     
     RefPtr<Label> beforeElse = generator.newLabel();
     RefPtr<Label> afterElse = generator.newLabel();
-
+	
+	//start our code
+    RefPtr<Label> beforeIf = generator.newLabel();
+	generator.emitLabel(beforeIf.get());
+	//end our code
+	
     if (m_condition->hasConditionContextCodegen()) {
         RefPtr<Label> beforeThen = generator.newLabel();
         generator.emitNodeInConditionContext(m_condition, beforeThen.get(), beforeElse.get(), true);
@@ -1455,7 +1465,7 @@ RegisterID* IfElseNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
     generator.emitLabel(afterElse.get());
 
 	// start our code
-//	generator.emitJoint();
+	generator.emitJoint(beforeIf.get());
 	// end our code
 
     // FIXME: This should return the last statement executed so that it can be returned as a Completion.
@@ -1487,7 +1497,7 @@ RegisterID* DoWhileNode::emitBytecode(BytecodeGenerator& generator, RegisterID* 
     generator.emitLabel(scope->breakTarget());
 	
 	// start our code
-//	generator.emitJoint();
+	generator.emitJoint(scope->continueTarget());
 	// end our code
 	
     return result.get();
@@ -1551,11 +1561,17 @@ RegisterID* ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
         generator.emitNode(generator.ignoredResult(), m_expr3);
 
     generator.emitLabel(condition.get());
+	// start our code
+	RefPtr<Label> beforeJump = generator.newLabel();
+	// end our code
     if (m_expr2) {
         if (m_expr2->hasConditionContextCodegen())
             generator.emitNodeInConditionContext(m_expr2, topOfLoop.get(), scope->breakTarget(), false);
         else {
             RegisterID* cond = generator.emitNode(m_expr2);
+			// start our code
+			generator.emitLabel(beforeJump.get());
+			// end our code
             generator.emitJumpIfTrue(cond, topOfLoop.get());
         }
     } else
@@ -1564,7 +1580,9 @@ RegisterID* ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
     generator.emitLabel(scope->breakTarget());
 	
 	// start our code
-//	generator.emitJoint();
+	if (m_expr2) {
+		generator.emitJoint(beforeJump.get());
+	}
 	// end our code
 	
     return result.get();
@@ -1644,7 +1662,7 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator, RegisterID* ds
     generator.emitLabel(scope->breakTarget());
 	
 	// start our code
-//	generator.emitJoint();
+//	generator.emitJoint(); //TODO: create proper programcounter behavior
 	// end our code
 	
     return dst;
@@ -1877,12 +1895,18 @@ RegisterID* SwitchNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
     RefPtr<LabelScope> scope = generator.newLabelScope(LabelScope::Switch);
 
     RefPtr<RegisterID> r0 = generator.emitNode(m_expr);
+	
+	// start our code
+	RefPtr<Label> beforeSwitch = generator.newLabel();
+	generator.emitLabel(beforeSwitch.get());
+	// end our code
+	
     RegisterID* r1 = m_block->emitBytecodeForBlock(generator, r0.get(), dst);
 	
     generator.emitLabel(scope->breakTarget());
 
     // start our code
-//	generator.emitJoint();
+	generator.emitJoint(beforeSwitch.get());
 	// end our code
 	
 	return r1;
