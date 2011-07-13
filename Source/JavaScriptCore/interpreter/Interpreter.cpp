@@ -801,6 +801,10 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
         lastGlobalObject->copyGlobalsTo(m_registerFile);
 
     m_registerFile.shrink(oldEnd);
+	
+	// -----------Instrumentation----------- //
+	result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	// ------------------------------------- //
 
     return checkedReturn(result);
 }
@@ -899,6 +903,11 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
         (*profiler)->didExecute(callFrame, function);
 
     m_registerFile.shrink(oldEnd);
+	
+	// -----------Instrumentation----------- //
+	result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	// ------------------------------------- //
+	
     return checkedReturn(result);
 }
 
@@ -1196,6 +1205,9 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
     m_registerFile.shrink(oldEnd);
     if (pushedScope)
         scopeChain->pop();
+	// -----------Instrumentation----------- //
+	result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	// ------------------------------------- //
     return checkedReturn(result);
 }
 
