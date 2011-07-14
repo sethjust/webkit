@@ -342,12 +342,6 @@ namespace JSC {
         void emitToPrimitive(RegisterID* dst, RegisterID* src);
 
         PassRefPtr<Label> emitLabel(Label*);
-		
-        // start our code
-        PassRefPtr<Label> emitJoint(Label* target);
-
-        // end our code
-        
         PassRefPtr<Label> emitJump(Label* target);
         PassRefPtr<Label> emitJumpIfTrue(RegisterID* cond, Label* target);
         PassRefPtr<Label> emitJumpIfFalse(RegisterID* cond, Label* target);
