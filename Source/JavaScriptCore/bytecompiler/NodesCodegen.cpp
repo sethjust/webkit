@@ -1418,10 +1418,6 @@ RegisterID* IfNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
 
     generator.emitNode(dst, m_ifBlock);
     generator.emitLabel(afterThen.get());
-	
-	// start our code
-	generator.emitJoint();
-	// end our code
 
     // FIXME: This should return the last statement executed so that it can be returned as a Completion.
     return 0;
@@ -1454,10 +1450,6 @@ RegisterID* IfElseNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
 
     generator.emitLabel(afterElse.get());
 
-	// start our code
-	generator.emitJoint();
-	// end our code
-
     // FIXME: This should return the last statement executed so that it can be returned as a Completion.
     return 0;
 }
@@ -1485,11 +1477,6 @@ RegisterID* DoWhileNode::emitBytecode(BytecodeGenerator& generator, RegisterID* 
     }
 
     generator.emitLabel(scope->breakTarget());
-	
-	// start our code
-	generator.emitJoint();
-	// end our code
-	
     return result.get();
 }
 
@@ -1517,10 +1504,6 @@ RegisterID* WhileNode::emitBytecode(BytecodeGenerator& generator, RegisterID* ds
     }
 
     generator.emitLabel(scope->breakTarget());
-	
-	// start our code
-	generator.emitJoint();
-	// end our code
     
     // FIXME: This should return the last statement executed so that it can be returned as a Completion
     return 0;
@@ -1562,11 +1545,6 @@ RegisterID* ForNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
         generator.emitJump(topOfLoop.get());
 
     generator.emitLabel(scope->breakTarget());
-	
-	// start our code
-	generator.emitJoint();
-	// end our code
-	
     return result.get();
 }
 
@@ -1642,11 +1620,6 @@ RegisterID* ForInNode::emitBytecode(BytecodeGenerator& generator, RegisterID* ds
     generator.emitNextPropertyName(propertyName, base.get(), i.get(), size.get(), iter.get(), loopStart.get());
     generator.emitDebugHook(WillExecuteStatement, firstLine(), lastLine());
     generator.emitLabel(scope->breakTarget());
-	
-	// start our code
-	generator.emitJoint();
-	// end our code
-	
     return dst;
 }
 

@@ -3821,16 +3821,8 @@ skip_id_custom_self:
 	//start our code
 	DEFINE_OPCODE(op_joint) {
 		/* joint
-		 
-		Dummy opcode to enable proper program counter behavior
-		*/
-        programCounter.Pop();
-#if LDEBUG
-        JPRINT("joining");
-		//printf("joining. PC has len %d\n", programCounter.Len());
-#endif
-		vPC += OPCODE_LENGTH(op_joint);
-		NEXT_INSTRUCTION();
+		 Dummy opcode to enable proper program counter behavior
+		 */
 	}
 	//end our code
     

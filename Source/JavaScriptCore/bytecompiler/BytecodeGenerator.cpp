@@ -746,9 +746,12 @@ void ALWAYS_INLINE BytecodeGenerator::rewindUnaryOp()
 }
 	
 // start our code
-void BytecodeGenerator::emitJoint()
+PassRefPtr<Label> BytecodeGenerator::emitJoint(Label* target)
 {
+	size_t begin = instructions().size();
 	emitOpcode(op_joint);
+	instructions().append(target->bind(begin, instructions().size()));
+	return target;
 }
 // end our code
 
