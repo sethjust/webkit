@@ -3825,7 +3825,7 @@ skip_id_custom_self:
 		Dummy opcode to enable proper program counter behavior
 		*/
 		int from = vPC[1].u.operand;
-				
+		
 		// Pop from the stack until we get the elem that we're joining from
 		while (1) {
 			bool br = (programCounter.Loc() == (long) &vPC[from]);
@@ -4233,14 +4233,6 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
-				
-        // begin modified code
-        programCounter.Push(scrutinee.label, (long) vPC);
-#if LDEBUG
-        JPRINT("switching");
-#endif
-        // end modified code
-		
         if (scrutinee.isInt32())
             vPC += codeBlock->immediateSwitchJumpTable(tableIndex).offsetForValue(scrutinee.asInt32(), defaultOffset);
         else {
@@ -4251,6 +4243,13 @@ skip_id_custom_self:
             else
                 vPC += defaultOffset;
         }
+
+        // begin modified code
+        programCounter.Push(scrutinee.label, (long) vPC);
+#if LDEBUG
+        JPRINT("switching");
+#endif
+        // end modified code
 
         NEXT_INSTRUCTION();
     }
@@ -4266,14 +4265,6 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
-		
-        // begin modified code
-        programCounter.Push(scrutinee.label, (long) vPC);
-#if LDEBUG
-        JPRINT("switching");
-#endif
-        // end modified code
-		
         if (!scrutinee.isString())
             vPC += defaultOffset;
         else {
@@ -4283,6 +4274,13 @@ skip_id_custom_self:
             else
                 vPC += codeBlock->characterSwitchJumpTable(tableIndex).offsetForValue(value->characters()[0], defaultOffset);
         }
+
+        // begin modified code
+        programCounter.Push(scrutinee.label, (long) vPC);
+#if LDEBUG
+        JPRINT("switching");
+#endif
+        // end modified code
 
         NEXT_INSTRUCTION();
     }
@@ -4298,6 +4296,10 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
+        if (!scrutinee.isString())
+            vPC += defaultOffset;
+        else 
+            vPC += codeBlock->stringSwitchJumpTable(tableIndex).offsetForValue(asString(scrutinee)->value(callFrame).impl(), defaultOffset);
 
         // begin modified code
         programCounter.Push(scrutinee.label, (long) vPC);
@@ -4305,11 +4307,6 @@ skip_id_custom_self:
         JPRINT("switching");
 #endif
         // end modified code
-		
-        if (!scrutinee.isString())
-            vPC += defaultOffset;
-        else 
-            vPC += codeBlock->stringSwitchJumpTable(tableIndex).offsetForValue(asString(scrutinee)->value(callFrame).impl(), defaultOffset);
 
         NEXT_INSTRUCTION();
     }
