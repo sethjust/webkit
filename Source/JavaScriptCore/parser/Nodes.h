@@ -162,9 +162,6 @@ namespace JSC {
         virtual bool hasConditionContextCodegen() const { return false; }
 
         virtual void emitBytecodeInConditionContext(BytecodeGenerator&, Label*, Label*, bool) { ASSERT_NOT_REACHED(); }
-	// start our code
-        virtual void emitBytecodeInConditionContext(BytecodeGenerator&, Label*, Label*, bool, RefPtr<Label>) { ASSERT_NOT_REACHED(); }
-	// end our code
 
         virtual ExpressionNode* stripUnaryPlus() { return this; }
 
@@ -804,9 +801,6 @@ namespace JSC {
         LogicalNotNode(JSGlobalData*, ExpressionNode*);
     private:
         void emitBytecodeInConditionContext(BytecodeGenerator&, Label* trueTarget, Label* falseTarget, bool fallThroughMeansTrue);
-	// start our code
-        void emitBytecodeInConditionContext(BytecodeGenerator&, Label* trueTarget, Label* falseTarget, bool fallThroughMeansTrue, RefPtr<Label> jumpLab);
-	// end our code
         virtual bool hasConditionContextCodegen() const { return expr()->hasConditionContextCodegen(); }
     };
 
@@ -978,9 +972,6 @@ namespace JSC {
     private:
         virtual RegisterID* emitBytecode(BytecodeGenerator&, RegisterID* = 0);
         void emitBytecodeInConditionContext(BytecodeGenerator&, Label* trueTarget, Label* falseTarget, bool fallThroughMeansTrue);
-	// start our code
-        void emitBytecodeInConditionContext(BytecodeGenerator&, Label* trueTarget, Label* falseTarget, bool fallThroughMeansTrue, RefPtr<Label> jumpLab);
-	// end our code
         virtual bool hasConditionContextCodegen() const { return true; }
 
         ExpressionNode* m_expr1;
