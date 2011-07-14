@@ -746,11 +746,9 @@ void ALWAYS_INLINE BytecodeGenerator::rewindUnaryOp()
 }
 	
 // start our code
-void BytecodeGenerator::emitJoint(Label* from)
+void BytecodeGenerator::emitJoint()
 {
-    size_t begin = instructions().size();
-		emitOpcode(op_joint);
-	instructions().append(from->bind(begin, instructions().size()));
+	emitOpcode(op_joint);
 }
 // end our code
 
