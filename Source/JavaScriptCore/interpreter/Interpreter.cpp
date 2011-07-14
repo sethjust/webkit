@@ -1623,13 +1623,13 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
            Copies register src to register dst.
         */
-		
-		/* original code
+
+        /* original code
         int dst = vPC[1].u.operand;
         int src = vPC[2].u.operand;
 		
-		callFrame->uncheckedR(dst) = callFrame->r(src);
-		*/
+        callFrame->uncheckedR(dst) = callFrame->r(src);
+        */
 		
         // begin modified code
         int dst = vPC[1].u.operand;
@@ -1652,6 +1652,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        //if (src1.isInt32() && src2.isInt32())
+        //    callFrame->uncheckedR(dst) = jsBoolean(src1.asInt32() == src2.asInt32());
+        //else {
         // begin modified code
         if (src1.isInt32() && src2.isInt32()) {
             JSValue result = jsBoolean(src1.asInt32() == src2.asInt32());
@@ -1680,6 +1683,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
 
         if (src.isUndefinedOrNull()) {
+            //callFrame->uncheckedR(dst) = jsBoolean(true);
             // begin modified code
             JSValue result = jsBoolean(true);
             result.updateLabel(src);
@@ -1690,6 +1694,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             NEXT_INSTRUCTION();
         }
         
+        //callFrame->uncheckedR(dst) = jsBoolean(src.isCell() && src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
         // begin modified code
         JSValue result = jsBoolean(src.isCell() && src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
         result.updateLabel(src);
@@ -1709,21 +1714,26 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         int dst = vPC[1].u.operand;
         JSValue src1 = callFrame->r(vPC[2].u.operand).jsValue();
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
+        //if (src1.isInt32() && src2.isInt32())
+        //    callFrame->uncheckedR(dst) = jsBoolean(src1.asInt32() != src2.asInt32());
+        // begin modified code
         if (src1.isInt32() && src2.isInt32()) {
-            // begin modified code
             JSValue result = jsBoolean(src1.asInt32() != src2.asInt32());
             result.updateLabel(src1);
             result.updateLabel(src2);
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
+        //else {
         } else {
+        // end modified code
             JSValue result = jsBoolean(!JSValue::equalSlowCase(callFrame, src1, src2));
             CHECK_FOR_EXCEPTION();
+        // start modified code
             result.updateLabel(src1);
             result.updateLabel(src2);
             result.updateLabel(programCounter.Head());
+        // end modified code
             callFrame->uncheckedR(dst) = result;
-            // end modified code
         }
 
         vPC += OPCODE_LENGTH(op_neq);
@@ -1739,6 +1749,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src = callFrame->r(vPC[2].u.operand).jsValue();
 
         if (src.isUndefinedOrNull()) {
+            //callFrame->uncheckedR(dst) = jsBoolean(false);
             // begin modified code
             JSValue result = jsBoolean(false);
             result.updateLabel(src);
@@ -1749,6 +1760,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
             NEXT_INSTRUCTION();
         }
         
+        //callFrame->uncheckedR(dst) = jsBoolean(!src.isCell() || !src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
         // begin modified code
         JSValue result = jsBoolean(!src.isCell() || !src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
         result.updateLabel(src);
@@ -1770,6 +1782,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         bool result = JSValue::strictEqual(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+        //callFrame->uncheckedR(dst) = jsBoolean(!src.isCell() || !src.asCell()->structure()->typeInfo().masqueradesAsUndefined());
         // begin modified code
         JSValue res = jsBoolean(result);
         res.updateLabel(src1);
@@ -1793,6 +1806,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSValue src2 = callFrame->r(vPC[3].u.operand).jsValue();
         bool result = !JSValue::strictEqual(callFrame, src1, src2);
         CHECK_FOR_EXCEPTION();
+        //callFrame->uncheckedR(dst) = jsBoolean(result);
         // begin modified code
         JSValue res = jsBoolean(result);
         res.updateLabel(src1);
@@ -3965,7 +3979,7 @@ skip_id_custom_self:
 
            Jumps to offset target from the current instruction, if and
            only if register src is not null.
-         */
+        */
         int src = vPC[1].u.operand;
         int target = vPC[2].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
