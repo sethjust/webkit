@@ -757,6 +757,12 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
         return checkedReturn(throwError(callFrame, error));
     CodeBlock* codeBlock = &program->generatedBytecode();
 
+    // Start our code
+    // Perform static analysis
+    StaticAnalyzer analyzer = StaticAnalyzer();
+    analyzer.genContextTable(codeBlock);
+    // End our code
+
     Register* oldEnd = m_registerFile.end();
     Register* newEnd = oldEnd + codeBlock->m_numParameters + RegisterFile::CallFrameHeaderSize + codeBlock->m_numCalleeRegisters;
     if (!m_registerFile.grow(newEnd))

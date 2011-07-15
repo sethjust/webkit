@@ -589,11 +589,8 @@
 		BCFD8C920EEB2EE700283848 /* JumpTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BCFD8C900EEB2EE700283848 /* JumpTable.cpp */; };
 		BCFD8C930EEB2EE700283848 /* JumpTable.h in Headers */ = {isa = PBXBuildFile; fileRef = BCFD8C910EEB2EE700283848 /* JumpTable.h */; };
 		C0A272630E50A06300E96E15 /* NotFound.h in Headers */ = {isa = PBXBuildFile; fileRef = C0A2723F0E509F1E00E96E15 /* NotFound.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		C21CDA3913B4E5DC000D5DAC /* Generator.h in Headers */ = {isa = PBXBuildFile; fileRef = C21CDA3713B4E5DC000D5DAC /* Generator.h */; };
-		C21CDA3A13B4E5DC000D5DAC /* Generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3813B4E5DC000D5DAC /* Generator.cpp */; };
 		C21CDA3D13B4EC35000D5DAC /* ProgramCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */; };
 		C21CDA3E13B4EC35000D5DAC /* ProgramCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */; };
-		C21CDA4913B5480C000D5DAC /* Generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3813B4E5DC000D5DAC /* Generator.cpp */; };
 		C21CDA4A13B54815000D5DAC /* ProgramCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */; };
 		C2ADA50A13C78B4F00C97DBD /* URLEntry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2ADA50613C78B4F00C97DBD /* URLEntry.cpp */; };
 		C2ADA50B13C78B4F00C97DBD /* URLEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = C2ADA50713C78B4F00C97DBD /* URLEntry.h */; };
@@ -621,6 +618,10 @@
 		E49DC16D12EF295300184A1F /* SourceProviderCacheItem.h in Headers */ = {isa = PBXBuildFile; fileRef = E49DC14912EF261A00184A1F /* SourceProviderCacheItem.h */; };
 		E4D8CEFB12FC439600BC9F5A /* BloomFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D8CE9B12FC42E100BC9F5A /* BloomFilter.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		F3BD31ED126735770065467F /* TextPosition.h in Headers */ = {isa = PBXBuildFile; fileRef = F3BD31D0126730180065467F /* TextPosition.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		F93629E313D0FB5F0079FDA0 /* FlowGraphNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93629DF13D0FB5F0079FDA0 /* FlowGraphNode.cpp */; };
+		F93629E413D0FB5F0079FDA0 /* FlowGraphNode.h in Headers */ = {isa = PBXBuildFile; fileRef = F93629E013D0FB5F0079FDA0 /* FlowGraphNode.h */; };
+		F93629F313D0FBE60079FDA0 /* StaticAnalyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */; };
+		F93629F413D0FBE60079FDA0 /* StaticAnalyzer.h in Headers */ = {isa = PBXBuildFile; fileRef = F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */; };
 		F9E93A0F13B3B3450070D745 /* JSLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9E93A0D13B3B3450070D745 /* JSLabel.cpp */; };
 		F9E93A1013B3B3450070D745 /* JSLabel.h in Headers */ = {isa = PBXBuildFile; fileRef = F9E93A0E13B3B3450070D745 /* JSLabel.h */; };
 		F9E93A2213B3B6650070D745 /* JSLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9E93A0D13B3B3450070D745 /* JSLabel.cpp */; };
@@ -1261,8 +1262,6 @@
 		BCFD8C900EEB2EE700283848 /* JumpTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JumpTable.cpp; sourceTree = "<group>"; };
 		BCFD8C910EEB2EE700283848 /* JumpTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JumpTable.h; sourceTree = "<group>"; };
 		C0A2723F0E509F1E00E96E15 /* NotFound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotFound.h; sourceTree = "<group>"; };
-		C21CDA3713B4E5DC000D5DAC /* Generator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Generator.h; sourceTree = "<group>"; };
-		C21CDA3813B4E5DC000D5DAC /* Generator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Generator.cpp; sourceTree = "<group>"; };
 		C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramCounter.h; sourceTree = "<group>"; };
 		C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProgramCounter.cpp; sourceTree = "<group>"; };
 		C2ADA50613C78B4F00C97DBD /* URLEntry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = URLEntry.cpp; sourceTree = "<group>"; };
@@ -1338,6 +1337,10 @@
 		F692A8850255597D01FF60F7 /* UString.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UString.cpp; sourceTree = "<group>"; tabWidth = 8; };
 		F692A8860255597D01FF60F7 /* UString.h */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = UString.h; sourceTree = "<group>"; tabWidth = 8; };
 		F692A8870255597D01FF60F7 /* JSValue.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSValue.cpp; sourceTree = "<group>"; tabWidth = 8; };
+		F93629DF13D0FB5F0079FDA0 /* FlowGraphNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FlowGraphNode.cpp; sourceTree = "<group>"; };
+		F93629E013D0FB5F0079FDA0 /* FlowGraphNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlowGraphNode.h; sourceTree = "<group>"; };
+		F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StaticAnalyzer.cpp; sourceTree = "<group>"; };
+		F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StaticAnalyzer.h; sourceTree = "<group>"; };
 		F9E93A0D13B3B3450070D745 /* JSLabel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSLabel.cpp; sourceTree = "<group>"; };
 		F9E93A0E13B3B3450070D745 /* JSLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSLabel.h; sourceTree = "<group>"; };
 		FDA15C1612B03028003A583A /* Complex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Complex.h; sourceTree = "<group>"; };
@@ -1410,6 +1413,7 @@
 		0867D691FE84028FC02AAC07 /* JavaScriptCore */ = {
 			isa = PBXGroup;
 			children = (
+				F93629DD13D0FB5F0079FDA0 /* analysis */,
 				F9E93A0C13B3B3450070D745 /* label */,
 				A718F8211178EB4B002465A7 /* create_regex_tables */,
 				937B63CC09E766D200A671DD /* DerivedSources.make */,
@@ -2219,6 +2223,17 @@
 			path = icu;
 			sourceTree = "<group>";
 		};
+		F93629DD13D0FB5F0079FDA0 /* analysis */ = {
+			isa = PBXGroup;
+			children = (
+				F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */,
+				F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */,
+				F93629DF13D0FB5F0079FDA0 /* FlowGraphNode.cpp */,
+				F93629E013D0FB5F0079FDA0 /* FlowGraphNode.h */,
+			);
+			path = analysis;
+			sourceTree = "<group>";
+		};
 		F9E93A0C13B3B3450070D745 /* label */ = {
 			isa = PBXGroup;
 			children = (
@@ -2228,8 +2243,6 @@
 				C2ADA50913C78B4F00C97DBD /* URLMap.h */,
 				F9E93A0D13B3B3450070D745 /* JSLabel.cpp */,
 				F9E93A0E13B3B3450070D745 /* JSLabel.h */,
-				C21CDA3713B4E5DC000D5DAC /* Generator.h */,
-				C21CDA3813B4E5DC000D5DAC /* Generator.cpp */,
 				C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */,
 				C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */,
 				C2B56D9713BA32040026B371 /* PCNode.h */,
@@ -2615,11 +2628,12 @@
 				141448CD13A1783700F5BA1A /* TinyBloomFilter.h in Headers */,
 				142A1D8413A19C84009DA5FE /* OldSpace.h in Headers */,
 				F9E93A1013B3B3450070D745 /* JSLabel.h in Headers */,
-				C21CDA3913B4E5DC000D5DAC /* Generator.h in Headers */,
 				C21CDA3D13B4EC35000D5DAC /* ProgramCounter.h in Headers */,
 				C2B56D9913BA32040026B371 /* PCNode.h in Headers */,
 				C2ADA50B13C78B4F00C97DBD /* URLEntry.h in Headers */,
 				C2ADA50D13C78B4F00C97DBD /* URLMap.h in Headers */,
+				F93629E413D0FB5F0079FDA0 /* FlowGraphNode.h in Headers */,
+				F93629F413D0FBE60079FDA0 /* StaticAnalyzer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3069,11 +3083,12 @@
 				14D2F3DA139F4BE200491031 /* NewSpace.cpp in Sources */,
 				142A1D8313A19C84009DA5FE /* OldSpace.cpp in Sources */,
 				F9E93A0F13B3B3450070D745 /* JSLabel.cpp in Sources */,
-				C21CDA3A13B4E5DC000D5DAC /* Generator.cpp in Sources */,
 				C21CDA3E13B4EC35000D5DAC /* ProgramCounter.cpp in Sources */,
 				C2B56D9A13BA32040026B371 /* PCNode.cpp in Sources */,
 				C2ADA50A13C78B4F00C97DBD /* URLEntry.cpp in Sources */,
 				C2ADA50C13C78B4F00C97DBD /* URLMap.cpp in Sources */,
+				F93629E313D0FB5F0079FDA0 /* FlowGraphNode.cpp in Sources */,
+				F93629F313D0FBE60079FDA0 /* StaticAnalyzer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3083,7 +3098,6 @@
 			files = (
 				932F5BDD0822A1C700736975 /* jsc.cpp in Sources */,
 				F9E93A2213B3B6650070D745 /* JSLabel.cpp in Sources */,
-				C21CDA4913B5480C000D5DAC /* Generator.cpp in Sources */,
 				C21CDA4A13B54815000D5DAC /* ProgramCounter.cpp in Sources */,
 				C2B56E4313BA46EA0026B371 /* PCNode.cpp in Sources */,
 			);
