@@ -9,13 +9,28 @@
 
 #include "StaticAnalyzer.h"
 
+#define ADEBUG 0
+
 namespace JSC {
 
 StaticAnalyzer::StaticAnalyzer(){ }
 
 void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
-  Vector<Instruction> instructions = codeBlock->instructions();
-  printf("genContextTable called on instructions starting at %lx\n", (long) instructions.begin());
+  if (ADEBUG)
+    printf("genContextTable called on instructions starting at %lx\n", (long) codeBlock->instructions().begin());
+
+  Instruction* begin = codeBlock->instructions().begin();
+  Instruction* vPC = begin;
+
+  while (vPC < codeBlock->instructions().end()) {
+    Opcode opcode = vPC->u.opcode;
+    int length = opcodeLengths[vPC->u.opcode];
+
+    if (ADEBUG)
+      printf("Opcode at pos %d is %d with length %d\n", (int) (vPC-begin), opcode, length );
+
+    vPC += length; // advance 1 pos.
+  }
 }
 
 }
