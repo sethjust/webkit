@@ -18,7 +18,7 @@ namespace JSC {
 	const int MAP_SIZE = 64; // map size
 	
 	class URLMap {
-	
+		
 	private:
 		URLEntry **map; // the map!
 		int idx; // current postition in map
@@ -40,6 +40,7 @@ namespace JSC {
 		long get(const char*); // takes script url as string and finds value
 		void put(const char*); // puts script url string in map and generates a value
 		long head(); // returns JSLabel at head of map
+		char * sHead(); // return head as char* array
 		~URLMap(); // deconstructor
 	};
 	
