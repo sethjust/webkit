@@ -621,7 +621,7 @@
 		F93629F313D0FBE60079FDA0 /* StaticAnalyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */; };
 		F93629F413D0FBE60079FDA0 /* StaticAnalyzer.h in Headers */ = {isa = PBXBuildFile; fileRef = F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */; };
 		F9E93A0F13B3B3450070D745 /* JSLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9E93A0D13B3B3450070D745 /* JSLabel.cpp */; };
-		F9E93A1013B3B3450070D745 /* JSLabel.h in Headers */ = {isa = PBXBuildFile; fileRef = F9E93A0E13B3B3450070D745 /* JSLabel.h */; };
+		F9E93A1013B3B3450070D745 /* JSLabel.h in Headers */ = {isa = PBXBuildFile; fileRef = F9E93A0E13B3B3450070D745 /* JSLabel.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FDA15C1E12B0305C003A583A /* Complex.h in Headers */ = {isa = PBXBuildFile; fileRef = FDA15C1612B03028003A583A /* Complex.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FE1B447A0ECCD73B004F4DD1 /* StdLibExtras.h in Headers */ = {isa = PBXBuildFile; fileRef = FE1B44790ECCD73B004F4DD1 /* StdLibExtras.h */; settings = {ATTRIBUTES = (Private, ); }; };
 /* End PBXBuildFile section */

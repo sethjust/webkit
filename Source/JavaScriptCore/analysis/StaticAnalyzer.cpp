@@ -24,7 +24,7 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   Instruction* begin = codeBlock->instructions().begin();
   Instruction* vPC = begin;
 
-  unsigned int count = codeBlock->instructionCount();
+  //unsigned int count = codeBlock->instructionCount();
 
   while (vPC < codeBlock->instructions().end()) {
     Opcode opcode = vPC->u.opcode;

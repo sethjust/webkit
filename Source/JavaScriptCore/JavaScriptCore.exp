@@ -612,3 +612,5 @@ __ZTVN3JSC8JSObjectE
 __ZTVN3JSC8JSStringE
 _jscore_fastmalloc_introspection
 _kJSClassDefinitionEmpty
+__ZNK3JSC7JSLabel3ValEv
+__ZN3JSC7JSLabelC1Ev
