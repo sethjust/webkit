@@ -7,10 +7,10 @@
  *
  */
 
-#include "config.h"
-
 #ifndef FlowGraph_h
 #define FlowGraph_h
+
+#include "config.h"
 
 typedef struct {
   unsigned int from;
@@ -36,7 +36,7 @@ class FlowGraph {
   AListNode* head;
   AListNode* tail;
   public:
-    FlowGraph() {}
+    FlowGraph();
     void add_edge( unsigned int from, unsigned int to);
 };
 

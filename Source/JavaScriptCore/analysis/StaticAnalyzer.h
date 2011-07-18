@@ -7,15 +7,15 @@
  *
  */
 
-#include "config.h"
-//#include "FlowGraph.h"
-#include "CodeBlock.h"
-#include "Instruction.h"
-
 #ifndef StaticAnalyzer_h
 #define StaticAnalyzer_h
 
+#include "config.h"
+#include "FlowGraph.h"
+
 namespace JSC {
+
+class CodeBlock;
 
 class StaticAnalyzer {
   

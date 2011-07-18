@@ -8,6 +8,8 @@
  */
 
 #include "StaticAnalyzer.h"
+#include "CodeBlock.h"
+#include "Instruction.h"
 
 #define ADEBUG 0
 
