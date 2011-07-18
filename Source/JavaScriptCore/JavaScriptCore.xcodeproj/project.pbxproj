@@ -618,8 +618,8 @@
 		E49DC16D12EF295300184A1F /* SourceProviderCacheItem.h in Headers */ = {isa = PBXBuildFile; fileRef = E49DC14912EF261A00184A1F /* SourceProviderCacheItem.h */; };
 		E4D8CEFB12FC439600BC9F5A /* BloomFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D8CE9B12FC42E100BC9F5A /* BloomFilter.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		F3BD31ED126735770065467F /* TextPosition.h in Headers */ = {isa = PBXBuildFile; fileRef = F3BD31D0126730180065467F /* TextPosition.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		F93629E313D0FB5F0079FDA0 /* FlowGraphNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93629DF13D0FB5F0079FDA0 /* FlowGraphNode.cpp */; };
-		F93629E413D0FB5F0079FDA0 /* FlowGraphNode.h in Headers */ = {isa = PBXBuildFile; fileRef = F93629E013D0FB5F0079FDA0 /* FlowGraphNode.h */; };
+		F93629E313D0FB5F0079FDA0 /* FlowGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93629DF13D0FB5F0079FDA0 /* FlowGraph.cpp */; };
+		F93629E413D0FB5F0079FDA0 /* FlowGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = F93629E013D0FB5F0079FDA0 /* FlowGraph.h */; };
 		F93629F313D0FBE60079FDA0 /* StaticAnalyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */; };
 		F93629F413D0FBE60079FDA0 /* StaticAnalyzer.h in Headers */ = {isa = PBXBuildFile; fileRef = F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */; };
 		F9E93A0F13B3B3450070D745 /* JSLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9E93A0D13B3B3450070D745 /* JSLabel.cpp */; };
@@ -1337,8 +1337,8 @@
 		F692A8850255597D01FF60F7 /* UString.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UString.cpp; sourceTree = "<group>"; tabWidth = 8; };
 		F692A8860255597D01FF60F7 /* UString.h */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = UString.h; sourceTree = "<group>"; tabWidth = 8; };
 		F692A8870255597D01FF60F7 /* JSValue.cpp */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSValue.cpp; sourceTree = "<group>"; tabWidth = 8; };
-		F93629DF13D0FB5F0079FDA0 /* FlowGraphNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FlowGraphNode.cpp; sourceTree = "<group>"; };
-		F93629E013D0FB5F0079FDA0 /* FlowGraphNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlowGraphNode.h; sourceTree = "<group>"; };
+		F93629DF13D0FB5F0079FDA0 /* FlowGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FlowGraph.cpp; sourceTree = "<group>"; };
+		F93629E013D0FB5F0079FDA0 /* FlowGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlowGraph.h; sourceTree = "<group>"; };
 		F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StaticAnalyzer.cpp; sourceTree = "<group>"; };
 		F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StaticAnalyzer.h; sourceTree = "<group>"; };
 		F9E93A0D13B3B3450070D745 /* JSLabel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSLabel.cpp; sourceTree = "<group>"; };
@@ -2228,8 +2228,8 @@
 			children = (
 				F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */,
 				F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */,
-				F93629DF13D0FB5F0079FDA0 /* FlowGraphNode.cpp */,
-				F93629E013D0FB5F0079FDA0 /* FlowGraphNode.h */,
+				F93629DF13D0FB5F0079FDA0 /* FlowGraph.cpp */,
+				F93629E013D0FB5F0079FDA0 /* FlowGraph.h */,
 			);
 			path = analysis;
 			sourceTree = "<group>";
@@ -2632,7 +2632,7 @@
 				C2B56D9913BA32040026B371 /* PCNode.h in Headers */,
 				C2ADA50B13C78B4F00C97DBD /* URLEntry.h in Headers */,
 				C2ADA50D13C78B4F00C97DBD /* URLMap.h in Headers */,
-				F93629E413D0FB5F0079FDA0 /* FlowGraphNode.h in Headers */,
+				F93629E413D0FB5F0079FDA0 /* FlowGraph.h in Headers */,
 				F93629F413D0FBE60079FDA0 /* StaticAnalyzer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3087,7 +3087,7 @@
 				C2B56D9A13BA32040026B371 /* PCNode.cpp in Sources */,
 				C2ADA50A13C78B4F00C97DBD /* URLEntry.cpp in Sources */,
 				C2ADA50C13C78B4F00C97DBD /* URLMap.cpp in Sources */,
-				F93629E313D0FB5F0079FDA0 /* FlowGraphNode.cpp in Sources */,
+				F93629E313D0FB5F0079FDA0 /* FlowGraph.cpp in Sources */,
 				F93629F313D0FBE60079FDA0 /* StaticAnalyzer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

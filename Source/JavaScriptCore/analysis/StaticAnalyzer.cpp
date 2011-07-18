@@ -22,6 +22,8 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   Instruction* begin = codeBlock->instructions().begin();
   Instruction* vPC = begin;
 
+  unsigned int count = codeBlock->instructionCount();
+
   while (vPC < codeBlock->instructions().end()) {
     Opcode opcode = vPC->u.opcode;
     int length = opcodeLengths[vPC->u.opcode];
@@ -29,7 +31,7 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
     if (ADEBUG)
       printf("Opcode at pos %d is %d with length %d\n", (int) (vPC-begin), opcode, length );
 
-    vPC += length; // advance 1 pos.
+    vPC += length; // advance 1 opcode
   }
 }
 
