@@ -591,6 +591,8 @@
 		C0A272630E50A06300E96E15 /* NotFound.h in Headers */ = {isa = PBXBuildFile; fileRef = C0A2723F0E509F1E00E96E15 /* NotFound.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		C21CDA3D13B4EC35000D5DAC /* ProgramCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */; };
 		C21CDA3E13B4EC35000D5DAC /* ProgramCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */; };
+		C29A2E6713D4E63300AE789A /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C29A2E6513D4E62900AE789A /* Logger.cpp */; };
+		C29A2E6813D4E63900AE789A /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = C29A2E6613D4E62900AE789A /* Logger.h */; };
 		C2ADA50A13C78B4F00C97DBD /* URLEntry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2ADA50613C78B4F00C97DBD /* URLEntry.cpp */; };
 		C2ADA50B13C78B4F00C97DBD /* URLEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = C2ADA50713C78B4F00C97DBD /* URLEntry.h */; };
 		C2ADA50C13C78B4F00C97DBD /* URLMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2ADA50813C78B4F00C97DBD /* URLMap.cpp */; };
@@ -1261,6 +1263,8 @@
 		C0A2723F0E509F1E00E96E15 /* NotFound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotFound.h; sourceTree = "<group>"; };
 		C21CDA3B13B4EC35000D5DAC /* ProgramCounter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramCounter.h; sourceTree = "<group>"; };
 		C21CDA3C13B4EC35000D5DAC /* ProgramCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProgramCounter.cpp; sourceTree = "<group>"; };
+		C29A2E6513D4E62900AE789A /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
+		C29A2E6613D4E62900AE789A /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		C2ADA50613C78B4F00C97DBD /* URLEntry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = URLEntry.cpp; sourceTree = "<group>"; };
 		C2ADA50713C78B4F00C97DBD /* URLEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLEntry.h; sourceTree = "<group>"; };
 		C2ADA50813C78B4F00C97DBD /* URLMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = URLMap.cpp; sourceTree = "<group>"; };
@@ -2234,6 +2238,8 @@
 		F9E93A0C13B3B3450070D745 /* label */ = {
 			isa = PBXGroup;
 			children = (
+				C29A2E6513D4E62900AE789A /* Logger.cpp */,
+				C29A2E6613D4E62900AE789A /* Logger.h */,
 				C2ADA50613C78B4F00C97DBD /* URLEntry.cpp */,
 				C2ADA50713C78B4F00C97DBD /* URLEntry.h */,
 				C2ADA50813C78B4F00C97DBD /* URLMap.cpp */,
@@ -2631,6 +2637,7 @@
 				C2ADA50D13C78B4F00C97DBD /* URLMap.h in Headers */,
 				F93629E413D0FB5F0079FDA0 /* FlowGraph.h in Headers */,
 				F93629F413D0FBE60079FDA0 /* StaticAnalyzer.h in Headers */,
+				C29A2E6813D4E63900AE789A /* Logger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3086,6 +3093,7 @@
 				C2ADA50C13C78B4F00C97DBD /* URLMap.cpp in Sources */,
 				F93629E313D0FB5F0079FDA0 /* FlowGraph.cpp in Sources */,
 				F93629F313D0FBE60079FDA0 /* StaticAnalyzer.cpp in Sources */,
+				C29A2E6713D4E63300AE789A /* Logger.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

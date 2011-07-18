@@ -93,6 +93,12 @@ namespace JSC {
 		return map[idx]->getValue();
 	}
 	
+	char * URLMap::sHead() {
+		char* temp;
+		sprintf(temp, "%ld", URLMap::urlmap().head());
+		return temp;
+	}
+	
 	URLMap::~URLMap() { // deconstructor
 		for (int i = idx; i >= 0; i--) { // delete non null entries
 			delete map[i];
