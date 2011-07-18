@@ -11,30 +11,76 @@
 #include "CodeBlock.h"
 #include "Instruction.h"
 
-#define ADEBUG 0
+#define ADEBUG 1
 
 namespace JSC {
 
 StaticAnalyzer::StaticAnalyzer(){ }
 
 void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
-  if (ADEBUG)
-    printf("genContextTable called on instructions starting at %lx\n", (long) codeBlock->instructions().begin());
-
   Instruction* begin = codeBlock->instructions().begin();
   Instruction* vPC = begin;
 
-  //unsigned int count = codeBlock->instructionCount();
+  FlowGraph graph = FlowGraph();
 
   while (vPC < codeBlock->instructions().end()) {
     Opcode opcode = vPC->u.opcode;
-    int length = opcodeLengths[vPC->u.opcode];
+    unsigned int pos = (int) (vPC-begin);
+    unsigned int length = opcodeLengths[vPC->u.opcode];
 
-    if (ADEBUG)
-      printf("Opcode at pos %d is %d with length %d\n", (int) (vPC-begin), opcode, length );
+    switch (opcode) {
+      // Unconditional w/ offset in vPC[1]
+      case op_jmp: 
+        graph.add_edge(pos, pos + vPC[1].u.operand);
+        break;
+
+      // Conditional w/ single offset in vPC[2]
+      case op_loop_if_true:
+      case op_loop_if_false:
+      case op_jtrue:
+      case op_jfalse:
+      case op_jeq_null:
+      case op_jneq_null:
+        graph.add_edge(pos, pos + vPC[2].u.operand);
+        graph.add_edge(pos, pos+length);
+        break;
+
+      // Conditional w/ single offset in vPC[3]
+      case op_jneq_ptr:
+      case op_loop_if_less:
+      case op_loop_if_lesseq:
+      case op_jnless:
+      case op_jless:
+      case op_jnlesseq:
+      case op_jlesseq:
+        graph.add_edge(pos, pos + vPC[3].u.operand);
+        graph.add_edge(pos, pos+length);
+        break;
+
+      // TODO: Switch tables need special treatment
+      /*
+      case op_switch_imm:
+      case op_switch_char:
+      case op_switch_string:
+       */
+
+      // End of method
+      case op_end:
+        graph.add_edge(pos, pos); // TODO: mark end node better?
+        break;
+
+      // Non-jumping/branching opcodes
+      default:
+        graph.add_edge(pos, pos+length);
+        break;
+    }
 
     vPC += length; // advance 1 opcode
   }
+  
+  if (ADEBUG)
+    graph.dump();
+
 }
 
 }

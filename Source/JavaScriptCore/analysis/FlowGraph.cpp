@@ -24,6 +24,12 @@ namespace JSC {
   void AListNode::set_next(AListNode* nnext) {
     m_next = nnext;
   }
+  void AListNode::dump() {
+    printf("edge from %d to %d\n", m_edge.from, m_edge.to);
+    if (m_next != NULL) {
+      m_next->dump();
+    }
+  }
 
   FlowGraph::FlowGraph() {
     head = new AListNode();
@@ -33,6 +39,11 @@ namespace JSC {
     AListNode* nnode = new AListNode(from, to);
     tail->set_next(nnode);
     tail = nnode;
+  }
+  void FlowGraph::dump() {
+    printf("\nCFG has:\n");
+    head -> dump();
+    printf("\n");
   }
 
 }

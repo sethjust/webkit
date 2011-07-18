@@ -30,6 +30,7 @@ class AListNode {
     AListNode* next() { return m_next; }
     edge_t edge() { return m_edge; }
     void set_next(AListNode* nnext);
+    void dump();
 };
 
 class FlowGraph {
@@ -38,6 +39,7 @@ class FlowGraph {
   public:
     FlowGraph();
     void add_edge( unsigned int from, unsigned int to);
+    void dump();
 };
 
 }
