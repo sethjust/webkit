@@ -778,7 +778,7 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
     newCallFrame->uncheckedR(newCallFrame->hostThisRegister()) = JSValue(thisObj);
 	
 	// -----------Instrumentation----------- //
-	//URLMap::urlmap().put(program->sourceURL().utf8().data());
+	URLMap::urlmap().put(program->sourceURL().utf8().data());
 	// ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
@@ -809,7 +809,7 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
     m_registerFile.shrink(oldEnd);
 	
 	// -----------Instrumentation----------- //
-	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	// ------------------------------------- //
 
     return checkedReturn(result);
@@ -860,7 +860,7 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
         newCallFrame->init(newCodeBlock, 0, callDataScopeChain, callFrame->addHostCallFrameFlag(), argCount, function);
 		
 		// -----------Instrumentation----------- //
-		//URLMap::urlmap().put(static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data());
+		URLMap::urlmap().put(static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data());
 		// ------------------------------------- //
 
         Profiler** profiler = Profiler::enabledProfilerReference();
@@ -911,7 +911,7 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
     m_registerFile.shrink(oldEnd);
 	
 	// -----------Instrumentation----------- //
-	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	// ------------------------------------- //
 	
     return checkedReturn(result);
@@ -1177,7 +1177,7 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
     newCallFrame->uncheckedR(newCallFrame->hostThisRegister()) = JSValue(thisObj);
 	
 	// -----------Instrumentation----------- //
-	//URLMap::urlmap().put(eval->sourceURL().utf8().data());
+	URLMap::urlmap().put(eval->sourceURL().utf8().data());
 	// ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
@@ -1212,7 +1212,7 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
     if (pushedScope)
         scopeChain->pop();
 	// -----------Instrumentation----------- //
-	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	// ------------------------------------- //
     return checkedReturn(result);
 }
