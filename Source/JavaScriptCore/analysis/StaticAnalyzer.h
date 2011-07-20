@@ -20,6 +20,7 @@ class CodeBlock;
 
 class StaticAnalyzer {
   FlowGraph* createFlowGraph(CodeBlock*);
+  void DFS(FlowGraph*);
 public:
   StaticAnalyzer();
   ContextTable* genContextTable(CodeBlock*);
