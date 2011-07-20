@@ -82,6 +82,10 @@ FlowGraph* StaticAnalyzer::createFlowGraph(CodeBlock* codeBlock) {
 
 }
 
+void StaticAnalyzer::DFS(FlowGraph*) {
+
+}
+
 ContextTable* StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   FlowGraph* graph = createFlowGraph(codeBlock);
   
