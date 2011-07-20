@@ -8,6 +8,7 @@
  */
 
 #include "FlowGraph.h"
+#include "CodeBlock.h"
 
 namespace JSC {
 
@@ -15,35 +16,128 @@ namespace JSC {
     m_next = NULL;
     m_edge.from = 0;
     m_edge.to = 0;
+    m_edge.inDFS = 0;
   }
   AListNode::AListNode( unsigned int from, unsigned int to ){
     m_next = NULL;
     m_edge.from = from;
     m_edge.to = to;
+    m_edge.inDFS = 0;
   }
   void AListNode::set_next(AListNode* nnext) {
     m_next = nnext;
   }
   void AListNode::dump() {
-    printf("edge from %d to %d\n", m_edge.from, m_edge.to);
+    if (m_edge.inDFS) printf("edge from %d to %d is in DFS\n", m_edge.from, m_edge.to);
+    else printf("edge from %d to %d\n", m_edge.from, m_edge.to);
     if (m_next != NULL) {
       m_next->dump();
     }
   }
 
-  FlowGraph::FlowGraph() {
+  FlowGraph::FlowGraph(CodeBlock* cb) {
+    codeBlock = cb;
+    
     head = new AListNode();
-    tail = head;
+
+    count = codeBlock->instructionCount();
+
+    Instruction* begin = codeBlock->instructions().begin();
+    Instruction* vPC = begin;
+
+    while (vPC < codeBlock->instructions().end()) {
+      Opcode opcode = vPC->u.opcode;
+      unsigned int pos = (long) (vPC-begin);
+      unsigned int length = opcodeLengths[vPC->u.opcode];
+
+      switch (opcode) {
+        // Unconditional w/ offset in vPC[1]
+        case op_jmp: 
+          add_edge(pos, pos + vPC[1].u.operand);
+          break;
+
+        // Conditional w/ single offset in vPC[2]
+        case op_loop_if_true:
+        case op_loop_if_false:
+        case op_jtrue:
+        case op_jfalse:
+        case op_jeq_null:
+        case op_jneq_null:
+          add_edge(pos, pos + vPC[2].u.operand);
+          add_edge(pos, pos+length);
+          break;
+
+        // Conditional w/ single offset in vPC[3]
+        case op_jneq_ptr:
+        case op_loop_if_less:
+        case op_loop_if_lesseq:
+        case op_jnless:
+        case op_jless:
+        case op_jnlesseq:
+        case op_jlesseq:
+          add_edge(pos, pos + vPC[3].u.operand);
+          add_edge(pos, pos+length);
+          break;
+
+        // TODO: Switch tables need special treatment
+        /*
+        case op_switch_imm:
+        case op_switch_char:
+        case op_switch_string:
+         */
+
+        // End of method
+        case op_end:
+          //add_edge(pos, pos); // TODO: mark end node better?
+          break;
+
+        // Non-jumping/branching opcodes
+        default:
+          add_edge(pos, pos+length);
+          break;
+      }
+      vPC += length; // advance 1 opcode
+    }
+    buildDFS();
   }
+
   void FlowGraph::add_edge( unsigned int from, unsigned int to){
     AListNode* nnode = new AListNode(from, to);
-    tail->set_next(nnode);
-    tail = nnode;
+    nnode->set_next(head);
+    head = nnode;
   }
+
+  void FlowGraph::buildDFS() {
+    // We still need to index the nodes in traversal order
+//    int indexes[count];
+//    for (int i=0; i<count; i++) {indexes[i]=0;}
+
+    bool visited[count];
+    for (int i=0; i<count; i++) {visited[i]=0;}
+    
+    DFS((int) (codeBlock->instructions().end() - codeBlock->instructions().begin() - OPCODE_LENGTH(op_end)), visited);
+  }
+
+  void FlowGraph::DFS(unsigned int node, bool visited[]) {
+    visited[node] = 1;
+
+    AListNode* current = head;
+    while (current) {
+      edge_t* edge = current->edge();
+      if ((edge->to == node) & (!visited[edge->from])){
+        edge->inDFS = 1;
+        DFS(edge->from, visited);
+      }
+
+      current = current->next();
+    }
+  }
+
   void FlowGraph::dump() {
-    printf("\nCFG has:\n");
-    head -> dump();
+    printf("\nCFG has\n");
+    head->dump();
     printf("\n");
   }
 
 }
+
