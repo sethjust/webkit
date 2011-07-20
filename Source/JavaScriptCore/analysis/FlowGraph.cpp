@@ -3,7 +3,7 @@
  *  JavaScriptCore
  *
  *  Created by Seth Just on 7/15/11.
- *  Copyright 2011 Alan Cleary and Seth Just. All rights reserved.
+ *  Copyright 2011 Utah State University. All rights reserved.
  *
  */
 
