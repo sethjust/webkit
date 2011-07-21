@@ -98,7 +98,6 @@ namespace JSC {
       }
       vPC += length; // advance 1 opcode
     }
-    buildDFS();
   }
 
   void FlowGraph::add_edge( unsigned int from, unsigned int to){
@@ -107,18 +106,28 @@ namespace JSC {
     head = nnode;
   }
 
-  void FlowGraph::buildDFS() {
-    // We still need to index the nodes in traversal order
-//    int indexes[count];
-//    for (int i=0; i<count; i++) {indexes[i]=0;}
+  int FlowGraph::buildDFS(int vertex[], int semi[]) {
+    
+    int* curIdx = new int;
+    *curIdx = 1;
 
     bool visited[count];
     for (int i=0; i<count; i++) {visited[i]=0;}
     
-    DFS((int) (codeBlock->instructions().end() - codeBlock->instructions().begin() - OPCODE_LENGTH(op_end)), visited);
+    DFS((int) (codeBlock->instructions().end() - codeBlock->instructions().begin() - OPCODE_LENGTH(op_end)),
+        vertex,
+        curIdx,
+        semi,
+        visited);
+
+    return *curIdx - 1;
+
   }
 
-  void FlowGraph::DFS(unsigned int node, bool visited[]) {
+  void FlowGraph::DFS(unsigned int node, int vertex[], int* curIdx, int semi[], bool visited[]) {
+    vertex[*curIdx] = node;
+    semi[node] = *curIdx;
+    *curIdx += 1;
     visited[node] = 1;
 
     AListNode* current = head;
@@ -126,7 +135,7 @@ namespace JSC {
       edge_t* edge = current->edge();
       if ((edge->to == node) & (!visited[edge->from])){
         edge->inDFS = 1;
-        DFS(edge->from, visited);
+        DFS(edge->from, vertex, curIdx, semi, visited);
       }
 
       current = current->next();
@@ -136,7 +145,6 @@ namespace JSC {
   void FlowGraph::dump() {
     printf("\nCFG has\n");
     head->dump();
-    printf("\n");
   }
 
 }

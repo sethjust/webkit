@@ -18,6 +18,12 @@ typedef struct {
   bool inDFS;
 } edge_t;
 
+typedef struct {
+  int* vertex;
+  int* semi;
+  int lastIdx;
+} DFSReport;
+
 namespace JSC {
   
 class CodeBlock; // To make includes all work properly -- we get errors if we straight-up #include CodeBlock.h
@@ -40,12 +46,14 @@ class FlowGraph {
   AListNode* head;
   CodeBlock* codeBlock;
   int count;
-  void buildDFS();
-  void DFS(unsigned int node, bool visited[]);
   void add_edge( unsigned int from, unsigned int to);
+  void DFS(unsigned int node, int vertex[], int* curIdx, int semi[], bool visited[]);
   public:
+    AListNode* Head() { return head; }
     FlowGraph(CodeBlock* cb);
     CodeBlock* code_block() { return codeBlock; }
+    int Count() { return count; }
+    int buildDFS(int vertex[], int semi[]);
     void dump();
 };
 
