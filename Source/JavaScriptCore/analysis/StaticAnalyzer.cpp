@@ -122,7 +122,7 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
 
   // Dump immediate dominators
   if (ADEBUG) {
-    printf("idom has\n");
+    printf("\nidom has\n");
     for (int i=0; i<count; i++) {
       if (idom[i]) printf("%d\t%d\n", i, idom[i]);
     }

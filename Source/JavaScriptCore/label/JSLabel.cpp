@@ -31,7 +31,7 @@ namespace JSC {
 	
 	// OR two labels
 	JSLabel JSLabel::Join(JSLabel l) {
-		return JSLabel (l.Val() | this->Val());
+		return *new JSLabel(l.Val() | this->Val());
 	}
 	
 }
