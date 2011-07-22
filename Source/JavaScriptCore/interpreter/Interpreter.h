@@ -40,7 +40,6 @@
 
 // start our code
 #include "ProgramCounter.h"
-#include "StaticAnalyzer.h"
 // end our code
 
 namespace JSC {

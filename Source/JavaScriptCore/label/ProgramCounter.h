@@ -21,11 +21,12 @@ namespace JSC {
 		int len;
 	public:
 		ProgramCounter(); // constructor
-		void Push(JSLabel, long); // push node to stack
+		void Push(JSLabel, int); // push node to stack
 		void Pop(); // remove and return head
 		JSLabel Head(); // return head
-		long Loc();
+		int Loc();
 		int Len();
+		void Join(JSLabel);
 	};
 }
 

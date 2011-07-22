@@ -92,9 +92,10 @@ ContextTable* StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   if (ADEBUG)
     graph->dump();
 
-  ContextTable* table = new ContextTable;
+  //ContextTable* table = new ContextTable;
 
-  return table;
+  //return table;
+  return contextTable;
 
 }
 

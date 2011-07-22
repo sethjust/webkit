@@ -15,7 +15,7 @@ namespace JSC {
 		node = new PCNode(NULL, JSLabel(), NULL);
 	}
 	
-	void ProgramCounter::Push(JSLabel l, long i) {
+	void ProgramCounter::Push(JSLabel l, int i) {
 		// TODO: have this join labels appropriately
 		node = new PCNode(node, l, i);
 		len++;
@@ -31,11 +31,15 @@ namespace JSC {
 		return node->Val();
 	}
 	
-	long ProgramCounter::Loc() {
+	int ProgramCounter::Loc() {
 		return node->Loc();
 	}
 	
 	int ProgramCounter::Len(){
 		return len;
+	}
+	
+	void ProgramCounter::Join(JSLabel label) {
+		node = new PCNode(node->Next(), node->Val().Join(label), node->Loc());
 	}
 }

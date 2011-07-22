@@ -17,13 +17,13 @@ namespace JSC {
 	class PCNode {
 		PCNode *node; // pointer to previous node
 		JSLabel value; // node value
-		long loc;
+		int loc;
 		
 	public:
-		PCNode(PCNode*, JSLabel, long); // constructor
+		PCNode(PCNode*, JSLabel, int); // constructor
 		PCNode* Next(); // next node (for pop)
 		JSLabel Val(); // return value
-		long Loc(); 
+		int Loc(); 
 	};
 }
 

@@ -23,7 +23,7 @@ class StaticAnalyzer {
   void DFS(FlowGraph*);
 public:
   StaticAnalyzer();
-  ContextTable* genContextTable(CodeBlock*);
+  contextTable genContextTable(CodeBlock*);
 };
 
 }
