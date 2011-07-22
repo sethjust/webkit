@@ -15,88 +15,123 @@
 
 namespace JSC {
 
-StaticAnalyzer::StaticAnalyzer(){ }
-
-FlowGraph* StaticAnalyzer::createFlowGraph(CodeBlock* codeBlock) {
-  Instruction* begin = codeBlock->instructions().begin();
-  Instruction* vPC = begin;
-
-  FlowGraph* graph = new FlowGraph();
-
-  while (vPC < codeBlock->instructions().end()) {
-    Opcode opcode = vPC->u.opcode;
-    unsigned int pos = (int) (vPC-begin);
-    unsigned int length = opcodeLengths[vPC->u.opcode];
-
-    switch (opcode) {
-      // Unconditional w/ offset in vPC[1]
-      case op_jmp: 
-        graph->add_edge(pos, pos + vPC[1].u.operand);
-        break;
-
-      // Conditional w/ single offset in vPC[2]
-      case op_loop_if_true:
-      case op_loop_if_false:
-      case op_jtrue:
-      case op_jfalse:
-      case op_jeq_null:
-      case op_jneq_null:
-        graph->add_edge(pos, pos + vPC[2].u.operand);
-        graph->add_edge(pos, pos+length);
-        break;
-
-      // Conditional w/ single offset in vPC[3]
-      case op_jneq_ptr:
-      case op_loop_if_less:
-      case op_loop_if_lesseq:
-      case op_jnless:
-      case op_jless:
-      case op_jnlesseq:
-      case op_jlesseq:
-        graph->add_edge(pos, pos + vPC[3].u.operand);
-        graph->add_edge(pos, pos+length);
-        break;
-
-      // TODO: Switch tables need special treatment
-      /*
-      case op_switch_imm:
-      case op_switch_char:
-      case op_switch_string:
-       */
-
-      // End of method
-      case op_end:
-        graph->add_edge(pos, pos); // TODO: mark end node better?
-        break;
-
-      // Non-jumping/branching opcodes
-      default:
-        graph->add_edge(pos, pos+length);
-        break;
-    }
-
-    vPC += length; // advance 1 opcode
-  }
-	
-  return graph;
-
+StaticAnalyzer::StaticAnalyzer(){
 }
 
-void StaticAnalyzer::DFS(FlowGraph*) {
-
-}
-
-ContextTable* StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
-  FlowGraph* graph = createFlowGraph(codeBlock);
+void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
+  int count = codeBlock->instructionCount();
   
+  // Create arrays for Branch information
+  branch = new bool[count];
+  for (int i=0; i<count; i++) { branch[i] = 0; }
+
+  // Generate the CFG
+  FlowGraph graph = FlowGraph(codeBlock, branch);
+  
+  // Dump branch information
+//  printf("branch has\n");
+//  for (int i=1; i<=count; i++) {
+//    printf("%d\t%d\n", i, branch[i]);
+//  }
+
+  // Create arrays to hold information from DFS. Note we need to initialize every entry to 0
+  int semi[count];
+  for (int i=0; i<count; i++) { semi[i] = 0; }
+  int vertex[count];
+  for (int i=0; i<count; i++) { vertex[i] = 0; }
+
+  // Perform DFS
+  int lastIdx = graph.buildDFS(vertex, semi);
+
+  // Dump CFG, including DFS information
   if (ADEBUG)
-    graph->dump();
+    graph.dump();
+  
+  // Dump vertex numbering from DFS
+//  printf("vertex has\n");
+//  for (int i=1; i<=lastIdx; i++) {
+//    printf("%d\t%d\n", i, vertex[i]);
+//  }
 
-  //ContextTable* table = new ContextTable;
+  // Semi currently maps node->number (before we run calculations on it); copy that, as we'll need it later
+  int number[count];
+  for (int i=0; i<count; i++) { number[i] = semi[i]; }
 
-  //return table;
-  return contextTable;
+  // Calculate semidominators
+  for (int i=lastIdx; i>1; i--) {
+    int node = vertex[i];
+    int minv = i;
 
+    AListNode* current = graph.Head();
+    while (current) {
+      edge_t* edge = current->edge();
+      if (edge->from == node){
+        if (semi[edge->to] < i) {
+          minv = semi[edge->to];
+        }
+      }
+
+      current = current->next();
+    }
+    semi[node] = minv;
+  }
+
+  // Dump semidominators
+//  printf("semi has\n");
+//  for (int i=0; i<count; i++) {
+//    if (semi[i]) printf("%d\t%d\n", i, semi[i]);
+//  }
+  
+  // Create array to hold idom information
+  idom = new int[count];
+  for (int i=0; i<count; i++) { idom[i] = 0; }
+
+  // Calculate idoms
+  for (int i=2; i<=lastIdx; i++) {
+    int node = vertex[i];
+
+    int minsu = lastIdx;
+    int u = 0;
+    int cnode = node;
+    while (1) { // Loop until we hit a child of semi[node] in our DFS traversal
+      if (number[cnode] == semi[node]) break;
+      if (minsu > semi[cnode]) {
+        minsu = semi[cnode];
+        u = cnode;
+      }
+      
+      // Loop over list of edges to find the parent of cnode in DFS
+      AListNode* current = graph.Head();
+      while (current) {
+        edge_t* edge = current->edge();
+        if ((edge->from == cnode) & (edge->inDFS)) {
+          cnode = edge->to; // Step to parent in DFS
+          break;
+        }
+        current = current->next();
+      }
+    }
+    if (semi[node] == minsu) idom[node] = minsu;  // first case of Corrollary 1
+    else idom[node] = idom[u];
+  }
+
+  // Convert idoms from DFS numbers to nodes
+  for (int i=0; i<count; i++) {
+    idom[i] = vertex[idom[i]];
+  }
+
+  // Dump immediate dominators
+  if (ADEBUG) {
+    printf("idom has\n");
+    for (int i=0; i<count; i++) {
+      if (idom[i]) printf("%d\t%d\n", i, idom[i]);
+    }
+  }
+
+}
+
+std::pair<int, bool> StaticAnalyzer::Context(int node) {
+  return std::pair<int, bool>(idom[node], branch[node]);
 }
 
 }

@@ -13,11 +13,14 @@
 #include "config.h"
 
 typedef struct {
-  unsigned int from;
-  unsigned int to;
+  int from;
+  int to;
+  bool inDFS;
 } edge_t;
 
 namespace JSC {
+  
+class CodeBlock; // To make includes all work properly -- we get errors if we straight-up #include CodeBlock.h
 
 // We store the CFG as an Adjacency list -- a linked list of edges
 
@@ -26,22 +29,39 @@ class AListNode {
   edge_t m_edge;
   public:
     AListNode();
-    AListNode( unsigned int from, unsigned int to );
+    AListNode( int from, int to );
     AListNode* next() { return m_next; }
-    edge_t edge() { return m_edge; }
+    edge_t* edge() { return &m_edge; }
     void set_next(AListNode* nnext);
     void dump();
 };
 
 class FlowGraph {
   AListNode* head;
-  AListNode* tail;
+  CodeBlock* codeBlock;
+  int count;
+  void add_edge( int from, int to);
+  void DFS(int node, int vertex[], int* curIdx, int semi[], bool visited[]);
   public:
-    FlowGraph();
-    void add_edge( unsigned int from, unsigned int to);
+    AListNode* Head() { return head; }
+    FlowGraph(CodeBlock* cb, bool* branch);
+    CodeBlock* code_block() { return codeBlock; }
+    int Count() { return count; }
+    int buildDFS(int vertex[], int semi[]);
     void dump();
 };
 
 }
 
 #endif // FlowGraph_h
+
+
+
+
+
+
+
+
+
+
+

@@ -622,8 +622,6 @@
 		F93629E413D0FB5F0079FDA0 /* FlowGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = F93629E013D0FB5F0079FDA0 /* FlowGraph.h */; };
 		F93629F313D0FBE60079FDA0 /* StaticAnalyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */; };
 		F93629F413D0FBE60079FDA0 /* StaticAnalyzer.h in Headers */ = {isa = PBXBuildFile; fileRef = F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */; };
-		F99D96A513D637F5003E1352 /* ContextTable.h in Headers */ = {isa = PBXBuildFile; fileRef = F99D96A313D637F5003E1352 /* ContextTable.h */; };
-		F99D96A613D637F5003E1352 /* ContextTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F99D96A413D637F5003E1352 /* ContextTable.cpp */; };
 		F9E93A0F13B3B3450070D745 /* JSLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F9E93A0D13B3B3450070D745 /* JSLabel.cpp */; };
 		F9E93A1013B3B3450070D745 /* JSLabel.h in Headers */ = {isa = PBXBuildFile; fileRef = F9E93A0E13B3B3450070D745 /* JSLabel.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FDA15C1E12B0305C003A583A /* Complex.h in Headers */ = {isa = PBXBuildFile; fileRef = FDA15C1612B03028003A583A /* Complex.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -1344,8 +1342,6 @@
 		F93629E013D0FB5F0079FDA0 /* FlowGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.h; path = FlowGraph.h; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		F93629F113D0FBE60079FDA0 /* StaticAnalyzer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; path = StaticAnalyzer.cpp; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.h; path = StaticAnalyzer.h; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		F99D96A313D637F5003E1352 /* ContextTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContextTable.h; sourceTree = "<group>"; };
-		F99D96A413D637F5003E1352 /* ContextTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextTable.cpp; sourceTree = "<group>"; };
 		F9E93A0D13B3B3450070D745 /* JSLabel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSLabel.cpp; sourceTree = "<group>"; };
 		F9E93A0E13B3B3450070D745 /* JSLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSLabel.h; sourceTree = "<group>"; };
 		FDA15C1612B03028003A583A /* Complex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Complex.h; sourceTree = "<group>"; };
@@ -2235,8 +2231,6 @@
 				F93629F213D0FBE60079FDA0 /* StaticAnalyzer.h */,
 				F93629DF13D0FB5F0079FDA0 /* FlowGraph.cpp */,
 				F93629E013D0FB5F0079FDA0 /* FlowGraph.h */,
-				F99D96A313D637F5003E1352 /* ContextTable.h */,
-				F99D96A413D637F5003E1352 /* ContextTable.cpp */,
 			);
 			path = analysis;
 			sourceTree = "<group>";
@@ -2644,7 +2638,6 @@
 				F93629E413D0FB5F0079FDA0 /* FlowGraph.h in Headers */,
 				F93629F413D0FBE60079FDA0 /* StaticAnalyzer.h in Headers */,
 				C29A2E6813D4E63900AE789A /* Logger.h in Headers */,
-				F99D96A513D637F5003E1352 /* ContextTable.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3101,7 +3094,6 @@
 				F93629E313D0FB5F0079FDA0 /* FlowGraph.cpp in Sources */,
 				F93629F313D0FBE60079FDA0 /* StaticAnalyzer.cpp in Sources */,
 				C29A2E6713D4E63300AE789A /* Logger.cpp in Sources */,
-				F99D96A613D637F5003E1352 /* ContextTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
