@@ -12,7 +12,6 @@
 
 #include "config.h"
 #include "FlowGraph.h"
-#include "ContextTable.h"
 
 namespace JSC {
 
@@ -20,10 +19,13 @@ class CodeBlock;
 
 class StaticAnalyzer {
   FlowGraph* createFlowGraph(CodeBlock*);
-  void DFS(FlowGraph*);
+  int* idom;
+  bool* branch;
 public:
   StaticAnalyzer();
-  ContextTable* genContextTable(CodeBlock*);
+  void genContextTable(CodeBlock*);
+
+  std::pair<int, bool> Context(int);
 };
 
 }

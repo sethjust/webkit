@@ -13,16 +13,10 @@
 #include "config.h"
 
 typedef struct {
-  unsigned int from;
-  unsigned int to;
+  int from;
+  int to;
   bool inDFS;
 } edge_t;
-
-typedef struct {
-  int* vertex;
-  int* semi;
-  int lastIdx;
-} DFSReport;
 
 namespace JSC {
   
@@ -35,7 +29,7 @@ class AListNode {
   edge_t m_edge;
   public:
     AListNode();
-    AListNode( unsigned int from, unsigned int to );
+    AListNode( int from, int to );
     AListNode* next() { return m_next; }
     edge_t* edge() { return &m_edge; }
     void set_next(AListNode* nnext);
@@ -46,11 +40,11 @@ class FlowGraph {
   AListNode* head;
   CodeBlock* codeBlock;
   int count;
-  void add_edge( unsigned int from, unsigned int to);
-  void DFS(unsigned int node, int vertex[], int* curIdx, int semi[], bool visited[]);
+  void add_edge( int from, int to);
+  void DFS(int node, int vertex[], int* curIdx, int semi[], bool visited[]);
   public:
     AListNode* Head() { return head; }
-    FlowGraph(CodeBlock* cb);
+    FlowGraph(CodeBlock* cb, bool* branch);
     CodeBlock* code_block() { return codeBlock; }
     int Count() { return count; }
     int buildDFS(int vertex[], int semi[]);

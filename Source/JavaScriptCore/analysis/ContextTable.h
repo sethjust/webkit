@@ -8,7 +8,10 @@
  */
 
 namespace JSC {
-  typedef std::pair<int, bool> context_t;
+  typedef struct {
+    int ipd;
+    bool branch;
+  } context_t;
 
   typedef context_t ContextTable[];
 //  class ContextTable {

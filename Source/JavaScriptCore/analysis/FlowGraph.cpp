@@ -18,7 +18,7 @@ namespace JSC {
     m_edge.to = 0;
     m_edge.inDFS = 0;
   }
-  AListNode::AListNode( unsigned int from, unsigned int to ){
+  AListNode::AListNode( int from, int to ){
     m_next = NULL;
     m_edge.from = from;
     m_edge.to = to;
@@ -35,7 +35,7 @@ namespace JSC {
     }
   }
 
-  FlowGraph::FlowGraph(CodeBlock* cb) {
+  FlowGraph::FlowGraph(CodeBlock* cb, bool* branch) {
     codeBlock = cb;
     
     head = new AListNode();
@@ -47,8 +47,8 @@ namespace JSC {
 
     while (vPC < codeBlock->instructions().end()) {
       Opcode opcode = vPC->u.opcode;
-      unsigned int pos = (long) (vPC-begin);
-      unsigned int length = opcodeLengths[vPC->u.opcode];
+      int pos = (long) (vPC-begin);
+      int length = opcodeLengths[vPC->u.opcode];
 
       switch (opcode) {
         // Unconditional w/ offset in vPC[1]
@@ -65,6 +65,7 @@ namespace JSC {
         case op_jneq_null:
           add_edge(pos, pos + vPC[2].u.operand);
           add_edge(pos, pos+length);
+          branch[pos] = 1;
           break;
 
         // Conditional w/ single offset in vPC[3]
@@ -77,6 +78,7 @@ namespace JSC {
         case op_jlesseq:
           add_edge(pos, pos + vPC[3].u.operand);
           add_edge(pos, pos+length);
+          branch[pos] = 1;
           break;
 
         // TODO: Switch tables need special treatment
@@ -100,7 +102,7 @@ namespace JSC {
     }
   }
 
-  void FlowGraph::add_edge( unsigned int from, unsigned int to){
+  void FlowGraph::add_edge( int from, int to){
     AListNode* nnode = new AListNode(from, to);
     nnode->set_next(head);
     head = nnode;
@@ -124,7 +126,7 @@ namespace JSC {
 
   }
 
-  void FlowGraph::DFS(unsigned int node, int vertex[], int* curIdx, int semi[], bool visited[]) {
+  void FlowGraph::DFS(int node, int vertex[], int* curIdx, int semi[], bool visited[]) {
     vertex[*curIdx] = node;
     semi[node] = *curIdx;
     *curIdx += 1;
