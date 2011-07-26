@@ -20,12 +20,9 @@ StaticAnalyzer::StaticAnalyzer(){
 
 void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   int count = codeBlock->instructionCount();
-  
-  // Create arrays for Branch information
-  branch = new bool[count];
 
   // Generate the CFG
-  FlowGraph graph = FlowGraph(codeBlock, branch);
+  FlowGraph graph = FlowGraph(codeBlock);
   
   // Dump branch information
 //  printf("branch has\n");
@@ -121,22 +118,13 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
 
   // Dump immediate dominators
   if (ADEBUG) {
-    printf("\nidom has\n");
+    printf("idom has\n");
     for (int i=0; i<count; i++) {
       if (idom[i]) printf("%d\t%d\n", i, idom[i]);
     }
-  }
-  
-  printf("Context has:\ni\tidom[i]\tbranch[i]\n");
-  for (int i=0; i<count; i++) {
-    std::pair<int, bool> con = Context(i);
-    printf("%d\t%d\t%d\n", i, con.first, con.second);
+    printf("\n");
   }
 
-}
-
-std::pair<int, bool> StaticAnalyzer::Context(int node) {
-  return std::pair<int, bool>(idom[node], branch[node]);
 }
 
 }

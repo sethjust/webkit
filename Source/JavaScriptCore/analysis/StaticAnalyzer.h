@@ -20,11 +20,10 @@ class CodeBlock;
 class StaticAnalyzer {
   FlowGraph* createFlowGraph(CodeBlock*);
   int* idom;
-  bool* branch;
 public:
   StaticAnalyzer();
   void genContextTable(CodeBlock*);
-  std::pair<int, bool> Context(int);
+  int IDom(int node) { return idom[node]; }
 };
 
 }

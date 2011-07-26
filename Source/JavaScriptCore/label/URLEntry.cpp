@@ -12,9 +12,9 @@
 namespace JSC {
 
 	URLEntry::URLEntry(const char* src, long value) {
-		printf("URLEntry recived %s\n", src);
+//		printf("URLEntry recived %s\n", src);
 		url = strdup(src);
-		printf("URLEntry stored %s as %s\n", src, url);
+//		printf("URLEntry stored %s as %s\n", src, url);
 		this->value = value;
 	}
 	
