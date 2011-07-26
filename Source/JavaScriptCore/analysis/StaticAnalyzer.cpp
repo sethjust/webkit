@@ -23,7 +23,6 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   
   // Create arrays for Branch information
   branch = new bool[count];
-  for (int i=0; i<count; i++) { branch[i] = 0; }
 
   // Generate the CFG
   FlowGraph graph = FlowGraph(codeBlock, branch);
@@ -126,6 +125,12 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
     for (int i=0; i<count; i++) {
       if (idom[i]) printf("%d\t%d\n", i, idom[i]);
     }
+  }
+  
+  printf("Context has:\ni\tidom[i]\tbranch[i]\n");
+  for (int i=0; i<count; i++) {
+    std::pair<int, bool> con = Context(i);
+    printf("%d\t%d\t%d\n", i, con.first, con.second);
   }
 
 }

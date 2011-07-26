@@ -1513,6 +1513,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 	// Start our code
     // Perform static analysis
     StaticAnalyzer analyzer = StaticAnalyzer();
+	analyzer.genContextTable(codeBlock);
     // End our code
 
 #define CHECK_FOR_EXCEPTION() \
@@ -1545,11 +1546,14 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #define OP_BRANCH() \
 	std::pair<int, bool> conTabIdx = analyzer.Context((int) (vPC - codeBlock->instructions().begin())); \
 	if(conTabIdx.second) { \
+		printf("We have a branch at instruction %d\n", (int) (vPC - codeBlock->instructions().begin())); \
 		ASSERT(!(op_label==NULL)); \
 		if (programCounter.Loc() == conTabIdx.first) { \
 			programCounter.Join(*op_label); \
+			printf("Joining label at top of PC\n"); \
 		} else { \
 			programCounter.Push(*op_label, conTabIdx.first); \
+			printf("Pushing label to top of PC with IPD %d\n", (int) (vPC - codeBlock->instructions().begin())); \
 		} \
 		op_label = NULL; \
 	}
@@ -1557,6 +1561,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #define OP_MERGE() \
 	if (programCounter.Loc() == (int) (vPC - codeBlock->instructions().begin())) { \
 		programCounter.Pop(); \
+		printf("Popping label at top of PC at location %d\n", (int) (vPC - codeBlock->instructions().begin())); \
 	}
 // ------------------------------------- //
 
@@ -1584,8 +1589,8 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #endif
     NEXT_INSTRUCTION();
 #else
-    //#define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); OP_MERGE(); OP_BRANCH(); goto interpreterLoopStart
-    #define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); goto interpreterLoopStart
+    #define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); OP_MERGE(); OP_BRANCH(); goto interpreterLoopStart
+    //#define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); goto interpreterLoopStart
 #if ENABLE(OPCODE_STATS)
     #define DEFINE_OPCODE(opcode) case opcode: OpcodeStats::recordInstruction(opcode);
 #else
@@ -3899,7 +3904,8 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-		op_label = new JSLabel(v.label.Val());
+        op_label = new JSLabel(v.label.Val());
+		printf("op_label is now pointing to %lx\n", (long) op_label);
 //        if (!(programCounter.Loc() == (long)vPC))
 //            programCounter.Push(v.label, (long) vPC);
 		
