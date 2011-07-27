@@ -29,7 +29,7 @@ namespace JSC {
 		return *label;
 	}
 	
-	// OR two labels
+	// return new label with OR'd vals
 	JSLabel JSLabel::Join(JSLabel l) {
 		return *new JSLabel(l.Val() | this->Val());
 	}

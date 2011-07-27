@@ -34,6 +34,7 @@
 #include <wtf/Noncopyable.h>
 
 #include <string.h> //for string concat
+#include "JSLabel.h"
 
 namespace JSC {
 
@@ -100,6 +101,13 @@ namespace JSC {
         virtual bool isPropertyNameIterator() const { return false; }
 
         Structure* structure() const;
+		
+		// -----------Instrumentation----------- //
+		JSLabel getLabel();
+		void setLabel(JSLabel);
+		JSLabel joinLabel(JSLabel);
+		void vJoinLabel(JSLabel);
+		// ------------------------------------- //
 
         // Extracting the value.
         bool getString(ExecState* exec, UString&) const;
@@ -168,6 +176,11 @@ namespace JSC {
         virtual bool getOwnPropertySlot(ExecState*, unsigned propertyName, PropertySlot&);
         
         WriteBarrier<Structure> m_structure;
+		
+		// -----------Instrumentation----------- //
+		JSLabel m_label;
+		// ------------------------------------- //
+		
     };
 
     inline JSCell::JSCell(JSGlobalData& globalData, Structure* structure)
@@ -199,6 +212,20 @@ namespace JSC {
     {
         visitor.append(&m_structure);
     }
+		
+	// -----------Instrumentation----------- //
+	inline JSLabel JSCell::getLabel() {
+		return m_label;
+	}
+		
+	inline void JSCell::setLabel(JSLabel l) {
+		m_label = l;
+	}
+		
+	inline JSLabel JSCell::joinLabel(JSLabel l) {
+		return m_label.Join(l);
+	}
+	// ------------------------------------- //
 
     // --- JSValue inlines ----------------------------
 

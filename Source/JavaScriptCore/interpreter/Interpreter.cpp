@@ -804,7 +804,8 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
     m_registerFile.shrink(oldEnd);
 	
 	// -----------Instrumentation----------- //
-	result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	result.setLabel(URLMap::urlmap().head());
 	// ------------------------------------- //
 
     return checkedReturn(result);
@@ -906,7 +907,8 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
     m_registerFile.shrink(oldEnd);
 	
 	// -----------Instrumentation----------- //
-	result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	result.setLabel(URLMap::urlmap().head());
 	// ------------------------------------- //
 	
     return checkedReturn(result);
@@ -1207,7 +1209,8 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
     if (pushedScope)
         scopeChain->pop();
 	// -----------Instrumentation----------- //
-	result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
+	result.setLabel(URLMap::urlmap().head());
 	// ------------------------------------- //
     return checkedReturn(result);
 }
@@ -1527,21 +1530,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
     OpcodeStats::resetLastInstruction();
 #endif
 	
-// -----------Instrumentation----------- //
-	/*
-#define OP_BRANCH() \
-	unsigned int idx = (int) (vPC - codeBlock->instructions().begin()); \
-	if(contextTable[idx].second) { \
-		ASSERT(op_label); \
-		if (programCounter.Loc() == contextTable[idx].first) { \
-			programCounter.Join(op_label); \
-		} else { \
-			programCounter.Push(op_label, contextTable[idx].first); \
-		} \
-		op_label = NULL; \
-	}
-	 */
-	
+// -----------Instrumentation----------- //	
 #define OP_BRANCH() \
 	std::pair<int, bool> conTabIdx = analyzer.Context((int) (vPC - codeBlock->instructions().begin())); \
 	if(conTabIdx.second) { \
@@ -1699,13 +1688,15 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         // begin modified code
         if (src1.isInt32() && src2.isInt32()) {
             JSValue result = jsBoolean(src1.asInt32() == src2.asInt32());
-            result.label = src1.label.Join(src2.label);
+            //result.label = src1.label.Join(src2.label);
+			result.setLabel(src1.joinLabel(src2.getLabel()));
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         } else {
             JSValue result = jsBoolean(JSValue::equalSlowCase(callFrame, src1, src2));
             CHECK_FOR_EXCEPTION();
-            result.label = src1.label.Join(src2.label);
+            //result.label = src1.label.Join(src2.label);
+			result.setLabel(src1.joinLabel(src2.getLabel()));
             result.updateLabel(programCounter.Head());
             callFrame->uncheckedR(dst) = result;
         }

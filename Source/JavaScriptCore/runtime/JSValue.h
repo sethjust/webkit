@@ -102,9 +102,15 @@ namespace JSC {
         friend class SpecializedThunkJIT;
 
     public:
-		JSLabel label; // Added JSLabel attribute for info flow tracking
-		void updateLabel(JSValue); // Convenience function for label updates
-		void updateLabel(JSLabel); // Convenience function for label updates
+		// -----------Instrumentation----------- //
+		// these will depreciate existing functions with calls to the cells
+		// should there be fallbacks for values without cells?
+		JSLabel getLabel();
+		void setLabel(JSLabel);
+		JSLabel joinLabel(JSLabel);
+		void updateLabel(JSLabel);
+		void updateLabel(JSValue);
+		// ------------------------------------- //
 		
         static EncodedJSValue encode(JSValue);
         static JSValue decode(EncodedJSValue);
@@ -236,6 +242,10 @@ namespace JSC {
 #endif
 
     private:
+		// -----------Instrumentation----------- //
+		JSLabel label; // Added JSLabel attribute for info flow tracking
+		// ------------------------------------- //
+		
         template <class T> JSValue(WriteBarrierBase<T>);
 
         enum HashTableDeletedValueTag { HashTableDeletedValue };

@@ -38,14 +38,50 @@ namespace JSC {
 
 static const double D32 = 4294967296.0;
     
-// start our code
+// -----------Instrumentation----------- //
+    
+/* depreciated
 void JSValue::updateLabel(JSValue other) {
     label = label.Join(other.label);
 }
 void JSValue::updateLabel(JSLabel other) {
     label = label.Join(other);
 }
-// end our code
+ */
+    
+// fallbacks use local label
+    // should they check if the value has become a cell?
+JSLabel JSValue::getLabel() {
+    if (isCell()) {
+	return asCell()->getLabel();
+    }
+    return label;
+}
+    
+void JSValue::setLabel(JSLabel l) {
+    if (isCell()) {
+	asCell()->setLabel(l);
+    }
+    else {
+	label = l;
+    }
+}
+    
+JSLabel JSValue::joinLabel(JSLabel l) {
+    if (isCell()) {
+	return asCell()->joinLabel(l);
+    }
+    return label.Join(l);
+}
+    
+void JSValue::updateLabel(JSLabel l) {
+    setLabel(joinLabel(l));
+}
+    
+void JSValue::updateLabel(JSValue v) {
+    setLabel(joinLabel(v.getLabel()));
+}
+// ------------------------------------- //
 
 // ECMA 9.4
 double JSValue::toInteger(ExecState* exec) const

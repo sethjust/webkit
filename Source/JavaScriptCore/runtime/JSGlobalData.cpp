@@ -131,7 +131,10 @@ void JSGlobalData::storeVPtrs()
 {
     // Enough storage to fit a JSArray, JSByteArray, JSString, or JSFunction.
     // COMPILE_ASSERTS below check that this is true.
-    char storage[64];
+	
+	// -----------Instrumentation----------- //
+    char storage[128]; // changed from 64 to fit JSLabel
+	// ------------------------------------- //
 
     COMPILE_ASSERT(sizeof(JSArray) <= sizeof(storage), sizeof_JSArray_must_be_less_than_storage);
     JSCell* jsArray = new (storage) JSArray(JSArray::VPtrStealingHack);

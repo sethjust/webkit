@@ -458,7 +458,7 @@ static void runInteractive(GlobalObject* globalObject)
             printf("Exception: %s\n", completion.value().toString(globalObject->globalExec()).utf8().data());
         else
             //printf("%s\n", completion.value().toString(globalObject->globalExec()).utf8().data());
-            printf("%s (labeled %lx)\n", completion.value().toString(globalObject->globalExec()).utf8().data(), completion.value().label.Val());
+            printf("%s (labeled %lx)\n", completion.value().toString(globalObject->globalExec()).utf8().data(), completion.value().getLabel().Val());
 
         globalObject->globalExec()->clearException();
     }
