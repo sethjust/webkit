@@ -29,7 +29,8 @@
 
 //defines for debugging label propogation
 #define LDEBUG true
-#define JPRINT(msg) printf("%s at %lx. PC has length %d and head %lx\n", msg, (long)vPC, programCounter.Len(), programCounter.Head().Val());
+#define UDEBUG true
+#define JPRINT(msg) printf("%s at location %d. PC has length %d and head %lx\n", msg, (int) (vPC - codeBlock->instructions().begin()), programCounter.Len(), programCounter.Head().Val());
 //end debugging defines
 
 #include "config.h"
@@ -774,6 +775,7 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
 	
 	// -----------Instrumentation----------- //
 	URLMap::urlmap().put(program->sourceURL().utf8().data());
+	if (UDEBUG) printf("Putting %s in url map from PROGRAM execute\n", program->sourceURL().utf8().data());
 	// ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
@@ -806,6 +808,11 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
 	// -----------Instrumentation----------- //
 	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	result.setLabel(URLMap::urlmap().head());
+	if (UDEBUG) {
+		printf("Head from URL map is %lx\n", URLMap::urlmap().head());
+		printf("Head assumed to be %lx\n", URLMap::urlmap().get(program->sourceURL().utf8().data()));
+		printf("JSValue label has value %lx after assignment\n", result.getLabel().Val());
+	}
 	// ------------------------------------- //
 
     return checkedReturn(result);
@@ -857,6 +864,7 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
 		
 		// -----------Instrumentation----------- //
 		URLMap::urlmap().put(static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data());
+		if (UDEBUG) printf("Putting %s in url map from FUNCTION execute\n", static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data());
 		// ------------------------------------- //
 
         Profiler** profiler = Profiler::enabledProfilerReference();
@@ -909,6 +917,11 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
 	// -----------Instrumentation----------- //
 	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	result.setLabel(URLMap::urlmap().head());
+	if (UDEBUG) {
+		printf("Head from URL map is %lx\n", URLMap::urlmap().head());
+		printf("Head assumed to be %lx\n", URLMap::urlmap().get(static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data()));
+		printf("JSValue label has value %lx after assignment\n", result.getLabel().Val());
+	}
 	// ------------------------------------- //
 	
     return checkedReturn(result);
@@ -1175,6 +1188,7 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
 	
 	// -----------Instrumentation----------- //
 	URLMap::urlmap().put(eval->sourceURL().utf8().data());
+	if (UDEBUG) printf("Putting %s in url map from EVAL execute\n", eval->sourceURL().utf8().data());
 	// ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
@@ -1211,6 +1225,11 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
 	// -----------Instrumentation----------- //
 	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	result.setLabel(URLMap::urlmap().head());
+	if (UDEBUG) {
+		printf("Head from URL map is %lx\n", URLMap::urlmap().head());
+		printf("Head assumed to be %lx\n", URLMap::urlmap().get(eval->sourceURL().utf8().data()));
+		printf("JSValue label has value %lx after assignment\n", result.getLabel().Val());
+	}
 	// ------------------------------------- //
     return checkedReturn(result);
 }
@@ -1531,22 +1550,21 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
     OpcodeStats::resetLastInstruction();
 #endif
 
-// -----------Instrumentation----------- //
+// -----------	----------- //
 #define OP_BRANCH(op_label) \
 	int IPD = analyzer.IDom((int) (vPC - codeBlock->instructions().begin())); \
-  if (LDEBUG) printf("We have a branch at instruction %d\n", (int) (vPC - codeBlock->instructions().begin())); \
   if (programCounter.Loc() == IPD) { \
     programCounter.Join(op_label); \
-    if (LDEBUG) printf("Joining label at top of PC with IPD %d\n", IPD); \
+    if (LDEBUG) printf("Joining label %lx to PC at location %d with IPD %d\n", op_label.Val(), (int) (vPC - codeBlock->instructions().begin()), IPD); \
   } else { \
     programCounter.Push(op_label, IPD); \
-    if (LDEBUG) printf("Pushing label %ld to top of PC with IPD %d\n", op_label.Val(), IPD); \
+    if (LDEBUG) printf("Pushing label %lx to PC at location %d with IPD %d\n", op_label.Val(), (int) (vPC - codeBlock->instructions().begin()), IPD); \
   }
 	
 #define OP_MERGE() \
 	if (programCounter.Loc() == (int) (vPC - codeBlock->instructions().begin())) { \
 		programCounter.Pop(); \
-		if (LDEBUG) printf("Popping label at top of PC at location %d\n", (int) (vPC - codeBlock->instructions().begin())); \
+		if (LDEBUG) printf("Popping label from PC at location %d\n", (int) (vPC - codeBlock->instructions().begin())); \
 	}
 // ------------------------------------- //
 
@@ -3890,14 +3908,12 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-        //op_label = new JSLabel(v.label.Val());
-        OP_BRANCH(v.getLabel());
-//        if (!(programCounter.Loc() == (long)vPC))
-//            programCounter.Push(v.label, (long) vPC);
 		
 #if LDEBUG
         JPRINT("looping if true");
 #endif
+        OP_BRANCH(v.getLabel());
+
         if (v.toBoolean(callFrame)) {
         // end modified code
             vPC += target;
@@ -3921,13 +3937,11 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-		//op_label = new JSLabel(v.label.Val());
-        OP_BRANCH(v.getLabel());
-//        if (!(programCounter.Loc() == (long)vPC))
-//            programCounter.Push(v.label, (long) vPC);
+
 #if LDEBUG
         JPRINT("looping if false");
 #endif
+        OP_BRANCH(v.getLabel());
         if (!v.toBoolean(callFrame)) {
         // end modified code
             vPC += target;
@@ -3948,12 +3962,11 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-		//op_label = new JSLabel(v.label.Val());
-        OP_BRANCH(v.getLabel());
-//        programCounter.Push(v.label, (long) vPC);
+
 #if LDEBUG
         JPRINT("jumping if true");
 #endif
+        OP_BRANCH(v.getLabel());
         if (v.toBoolean(callFrame)) {
         // end modified code
         //if (callFrame->r(cond).jsValue().toBoolean(callFrame)) {
@@ -3974,12 +3987,11 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-		//op_label = new JSLabel(v.label.Val());
-        OP_BRANCH(v.getLabel());
-//        programCounter.Push(v.label, (long) vPC);
+
 #if LDEBUG
         JPRINT("jumping if false");
 #endif
+        OP_BRANCH(v.getLabel());
         if (!v.toBoolean(callFrame)) {
         // end modified code
         //if (!callFrame->r(cond).jsValue().toBoolean(callFrame)) {
@@ -3999,14 +4011,12 @@ skip_id_custom_self:
         int src = vPC[1].u.operand;
         int target = vPC[2].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
-		//op_label = new JSLabel(srcValue.label.Val());
-        OP_BRANCH(srcValue.getLabel());
         
         // begin modified code
-//        programCounter.Push(srcValue.label, (long) vPC);
 #if LDEBUG
         JPRINT("jumping if null");
 #endif
+        OP_BRANCH(srcValue.getLabel());
         // end modified code
         
         if (srcValue.isUndefinedOrNull() || (srcValue.isCell() && srcValue.asCell()->structure()->typeInfo().masqueradesAsUndefined())) {
@@ -4026,14 +4036,12 @@ skip_id_custom_self:
         int src = vPC[1].u.operand;
         int target = vPC[2].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
-		//op_label = new JSLabel(srcValue.label.Val());
-        OP_BRANCH(srcValue.getLabel());
 
         // begin modified code
-//        programCounter.Push(srcValue.label, (long) vPC);
 #if LDEBUG
         JPRINT("jumping if not null");
 #endif
+        OP_BRANCH(srcValue.getLabel());
         // end modified code
 
         if (!srcValue.isUndefinedOrNull() && (!srcValue.isCell() || !srcValue.asCell()->structure()->typeInfo().masqueradesAsUndefined())) {
@@ -4054,9 +4062,11 @@ skip_id_custom_self:
         int target = vPC[3].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
         // begin modified code
-		//op_label = new JSLabel(srcValue.label.Val());
+
+#if LDEBUG
+        JPRINT("jumping if neq_ptr");
+#endif
         OP_BRANCH(srcValue.getLabel());
-        //programCounter.Push(srcValue.label, (long) vPC); //commented because I'm unsure if this opcode will have a corresponding joint
         // end modified code
         if (srcValue != vPC[2].u.jsCell.get()) {
             vPC += target;
@@ -4085,13 +4095,11 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
-        OP_BRANCH(src1.joinLabel(src2.getLabel()));
-//        if (!(programCounter.Loc() == (long)vPC))
-//            programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+
 #if LDEBUG
         JPRINT("looping if less");
 #endif
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
         // end modified code
         
         if (result) {
@@ -4122,13 +4130,11 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
-        OP_BRANCH(src1.joinLabel(src2.getLabel()));
-//        if (!(programCounter.Loc() == (long)vPC))
-//            programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+
 #if LDEBUG
         JPRINT("looping if less or eq");
 #endif
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
         // end modified code
         
         if (result) {
@@ -4156,12 +4162,11 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
-        OP_BRANCH(src1.joinLabel(src2.getLabel()));
-//        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+
 #if LDEBUG
         JPRINT("jumping if not less");
 #endif
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
         // end modified code
         
         if (!result) {
@@ -4188,12 +4193,11 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
-        OP_BRANCH(src1.joinLabel(src2.getLabel()));
-//        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+
 #if LDEBUG
         JPRINT("jumping if less");
 #endif
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
         // end modified code
         
         if (result) {
@@ -4220,12 +4224,11 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
-        OP_BRANCH(src1.joinLabel(src2.getLabel()));
-//        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+
 #if LDEBUG
         JPRINT("jumping if not less or eq");
 #endif
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
         // end modified code
         
         if (!result) {
@@ -4252,12 +4255,11 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
-        OP_BRANCH(src1.joinLabel(src2.getLabel()));
-//        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
+
 #if LDEBUG
         JPRINT("jumping if less or eq");
 #endif
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
         // end modified code
         
         if (result) {

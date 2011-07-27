@@ -17,7 +17,6 @@ namespace JSC {
 	}
 	
 	void ProgramCounter::Push(JSLabel l, int i) {
-		// TODO: have this join labels appropriately
 		node = new PCNode(node, Head().Join(l), i);
 		len++;
 	}
