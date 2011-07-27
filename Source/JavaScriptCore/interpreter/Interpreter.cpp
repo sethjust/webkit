@@ -1533,10 +1533,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 	int IPD = analyzer.IDom((int) (vPC - codeBlock->instructions().begin())); \
   if (programCounter.Loc() == IPD) { \
     programCounter.Join(op_label); \
-    if (LDEBUG) printf("Joining label on PC at location %d with IPD %d\n", (int) (vPC - codeBlock->instructions().begin()), IPD); \
+    if (LDEBUG) printf("Joining label %lx to PC at location %d with IPD %d\n", op_label.Val(), (int) (vPC - codeBlock->instructions().begin()), IPD); \
   } else { \
     programCounter.Push(op_label, IPD); \
-    if (LDEBUG) printf("Pushing label to PC at location %d with IPD %d\n", (int) (vPC - codeBlock->instructions().begin()), IPD); \
+    if (LDEBUG) printf("Pushing label %lx to PC at location %d with IPD %d\n", op_label.Val(), (int) (vPC - codeBlock->instructions().begin()), IPD); \
   }
 	
 #define OP_MERGE() \
