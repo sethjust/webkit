@@ -44,7 +44,7 @@ class FlowGraph {
   void DFS(int node, int vertex[], int* curIdx, int semi[], bool visited[]);
   public:
     AListNode* Head() { return head; }
-    FlowGraph(CodeBlock* cb, bool* branch);
+    FlowGraph(CodeBlock* cb);
     CodeBlock* code_block() { return codeBlock; }
     int Count() { return count; }
     int buildDFS(int vertex[], int semi[]);

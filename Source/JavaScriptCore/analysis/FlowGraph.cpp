@@ -35,16 +35,17 @@ namespace JSC {
     }
   }
 
-  FlowGraph::FlowGraph(CodeBlock* cb, bool* branch) {
+  FlowGraph::FlowGraph(CodeBlock* cb) {
+    // Initialize instance variables
     codeBlock = cb;
-    
-    head = new AListNode();
-
+    head = NULL;
     count = codeBlock->instructionCount();
-
+    
+    // Initialize locals
     Instruction* begin = codeBlock->instructions().begin();
     Instruction* vPC = begin;
 
+    // Loop over opcodes to build CFG
     while (vPC < codeBlock->instructions().end()) {
       Opcode opcode = vPC->u.opcode;
       int pos = (long) (vPC-begin);
@@ -65,7 +66,6 @@ namespace JSC {
         case op_jneq_null:
           add_edge(pos, pos + vPC[2].u.operand);
           add_edge(pos, pos+length);
-          branch[pos] = 1;
           break;
 
         // Conditional w/ single offset in vPC[3]
@@ -78,7 +78,6 @@ namespace JSC {
         case op_jlesseq:
           add_edge(pos, pos + vPC[3].u.operand);
           add_edge(pos, pos+length);
-          branch[pos] = 1;
           break;
 
         // TODO: Switch tables need special treatment
@@ -87,6 +86,8 @@ namespace JSC {
         case op_switch_char:
         case op_switch_string:
          */
+
+        // TODO: op_next_pname (and others that jump?)
 
         // End of method
         case op_end:
@@ -147,6 +148,7 @@ namespace JSC {
   void FlowGraph::dump() {
     printf("\nCFG has\n");
     head->dump();
+    printf("\n");
   }
 
 }

@@ -11,7 +11,7 @@
 #include "CodeBlock.h"
 #include "Instruction.h"
 
-#define ADEBUG 1
+#define ADEBUG false
 
 namespace JSC {
 
@@ -20,19 +20,9 @@ StaticAnalyzer::StaticAnalyzer(){
 
 void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   int count = codeBlock->instructionCount();
-  
-  // Create arrays for Branch information
-  branch = new bool[count];
-  for (int i=0; i<count; i++) { branch[i] = 0; }
 
   // Generate the CFG
-  FlowGraph graph = FlowGraph(codeBlock, branch);
-  
-  // Dump branch information
-//  printf("branch has\n");
-//  for (int i=1; i<=count; i++) {
-//    printf("%d\t%d\n", i, branch[i]);
-//  }
+  FlowGraph graph = FlowGraph(codeBlock);
 
   // Create arrays to hold information from DFS. Note we need to initialize every entry to 0
   int semi[count];
@@ -47,11 +37,13 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   if (ADEBUG)
     graph.dump();
   
-  // Dump vertex numbering from DFS
-//  printf("vertex has\n");
-//  for (int i=1; i<=lastIdx; i++) {
-//    printf("%d\t%d\n", i, vertex[i]);
-//  }
+  // Dump vertex numbering from DFS (vertex[] maps number->node)
+  if (ADEBUG) {
+    printf("vertex has\n");
+    for (int i=1; i<=lastIdx; i++) {
+      printf("%d\t%d\n", i, vertex[i]);
+    }
+  }
 
   // Semi currently maps node->number (before we run calculations on it); copy that, as we'll need it later
   int number[count];
@@ -66,7 +58,7 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
     while (current) {
       edge_t* edge = current->edge();
       if (edge->from == node){
-        if (semi[edge->to] < i) {
+        if (semi[edge->to] < minv) {
           minv = semi[edge->to];
         }
       }
@@ -77,10 +69,12 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   }
 
   // Dump semidominators
-//  printf("semi has\n");
-//  for (int i=0; i<count; i++) {
-//    if (semi[i]) printf("%d\t%d\n", i, semi[i]);
-//  }
+  if (ADEBUG) {
+    printf("semi has\n");
+    for (int i=0; i<count; i++) {
+      if (semi[i]) printf("%d\t%d\n", i, semi[i]);
+    }
+  }
   
   // Create array to hold idom information
   idom = new int[count];
@@ -122,16 +116,13 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
 
   // Dump immediate dominators
   if (ADEBUG) {
-    printf("\nidom has\n");
+    printf("idom has\n");
     for (int i=0; i<count; i++) {
       if (idom[i]) printf("%d\t%d\n", i, idom[i]);
     }
+    printf("\n");
   }
 
-}
-
-std::pair<int, bool> StaticAnalyzer::Context(int node) {
-  return std::pair<int, bool>(idom[node], branch[node]);
 }
 
 }

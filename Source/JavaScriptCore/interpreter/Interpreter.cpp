@@ -28,7 +28,7 @@
  */
 
 //defines for debugging label propogation
-#define LDEBUG 0
+#define LDEBUG true
 #define JPRINT(msg) printf("%s at %lx. PC has length %d and head %lx\n", msg, (long)vPC, programCounter.Len(), programCounter.Head().Val());
 //end debugging defines
 
@@ -1516,6 +1516,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 	// Start our code
     // Perform static analysis
     StaticAnalyzer analyzer = StaticAnalyzer();
+	analyzer.genContextTable(codeBlock);
     // End our code
 
 #define CHECK_FOR_EXCEPTION() \
@@ -1529,23 +1530,23 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #if ENABLE(OPCODE_STATS)
     OpcodeStats::resetLastInstruction();
 #endif
-	
-// -----------Instrumentation----------- //	
-#define OP_BRANCH() \
-	std::pair<int, bool> conTabIdx = analyzer.Context((int) (vPC - codeBlock->instructions().begin())); \
-	if(conTabIdx.second) { \
-		ASSERT(!(op_label==NULL)); \
-		if (programCounter.Loc() == conTabIdx.first) { \
-			programCounter.Join(*op_label); \
-		} else { \
-			programCounter.Push(*op_label, conTabIdx.first); \
-		} \
-		op_label = NULL; \
-	}
+
+// -----------Instrumentation----------- //
+#define OP_BRANCH(op_label) \
+	int IPD = analyzer.IDom((int) (vPC - codeBlock->instructions().begin())); \
+  if (LDEBUG) printf("We have a branch at instruction %d\n", (int) (vPC - codeBlock->instructions().begin())); \
+  if (programCounter.Loc() == IPD) { \
+    programCounter.Join(op_label); \
+    if (LDEBUG) printf("Joining label at top of PC with IPD %d\n", IPD); \
+  } else { \
+    programCounter.Push(op_label, IPD); \
+    if (LDEBUG) printf("Pushing label %ld to top of PC with IPD %d\n", op_label.Val(), IPD); \
+  }
 	
 #define OP_MERGE() \
 	if (programCounter.Loc() == (int) (vPC - codeBlock->instructions().begin())) { \
 		programCounter.Pop(); \
+		if (LDEBUG) printf("Popping label at top of PC at location %d\n", (int) (vPC - codeBlock->instructions().begin())); \
 	}
 // ------------------------------------- //
 
@@ -1565,7 +1566,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #endif
 
 #if ENABLE(COMPUTED_GOTO_INTERPRETER)
-#define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); OP_MERGE(); OP_BRANCH(); goto *vPC->u.opcode
+#define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); OP_MERGE(); goto *vPC->u.opcode
 #if ENABLE(OPCODE_STATS)
     #define DEFINE_OPCODE(opcode) opcode: OpcodeStats::recordInstruction(opcode);
 #else
@@ -1573,14 +1574,13 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 #endif
     NEXT_INSTRUCTION();
 #else
-    //#define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); OP_MERGE(); OP_BRANCH(); goto interpreterLoopStart
-    #define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); goto interpreterLoopStart
+    #define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); OP_MERGE(); goto interpreterLoopStart
+    //#define NEXT_INSTRUCTION() SAMPLE(codeBlock, vPC); goto interpreterLoopStart
 #if ENABLE(OPCODE_STATS)
     #define DEFINE_OPCODE(opcode) case opcode: OpcodeStats::recordInstruction(opcode);
 #else
     #define DEFINE_OPCODE(opcode) case opcode:
 #endif
-	JSLabel* op_label = NULL;
     while (1) { // iterator loop begins
     interpreterLoopStart:;
     switch (vPC->u.opcode)
@@ -3890,7 +3890,8 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-		op_label = new JSLabel(v.label.Val());
+        //op_label = new JSLabel(v.label.Val());
+        OP_BRANCH(v.getLabel());
 //        if (!(programCounter.Loc() == (long)vPC))
 //            programCounter.Push(v.label, (long) vPC);
 		
@@ -3920,7 +3921,8 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-		op_label = new JSLabel(v.label.Val());
+		//op_label = new JSLabel(v.label.Val());
+        OP_BRANCH(v.getLabel());
 //        if (!(programCounter.Loc() == (long)vPC))
 //            programCounter.Push(v.label, (long) vPC);
 #if LDEBUG
@@ -3946,7 +3948,8 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-		op_label = new JSLabel(v.label.Val());
+		//op_label = new JSLabel(v.label.Val());
+        OP_BRANCH(v.getLabel());
 //        programCounter.Push(v.label, (long) vPC);
 #if LDEBUG
         JPRINT("jumping if true");
@@ -3971,7 +3974,8 @@ skip_id_custom_self:
         int target = vPC[2].u.operand;
         // begin modified code
         JSValue v = callFrame->r(cond).jsValue();
-		op_label = new JSLabel(v.label.Val());
+		//op_label = new JSLabel(v.label.Val());
+        OP_BRANCH(v.getLabel());
 //        programCounter.Push(v.label, (long) vPC);
 #if LDEBUG
         JPRINT("jumping if false");
@@ -3995,7 +3999,8 @@ skip_id_custom_self:
         int src = vPC[1].u.operand;
         int target = vPC[2].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
-		op_label = new JSLabel(srcValue.label.Val());
+		//op_label = new JSLabel(srcValue.label.Val());
+        OP_BRANCH(srcValue.getLabel());
         
         // begin modified code
 //        programCounter.Push(srcValue.label, (long) vPC);
@@ -4021,7 +4026,8 @@ skip_id_custom_self:
         int src = vPC[1].u.operand;
         int target = vPC[2].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
-		op_label = new JSLabel(srcValue.label.Val());
+		//op_label = new JSLabel(srcValue.label.Val());
+        OP_BRANCH(srcValue.getLabel());
 
         // begin modified code
 //        programCounter.Push(srcValue.label, (long) vPC);
@@ -4048,7 +4054,8 @@ skip_id_custom_self:
         int target = vPC[3].u.operand;
         JSValue srcValue = callFrame->r(src).jsValue();
         // begin modified code
-		op_label = new JSLabel(srcValue.label.Val());
+		//op_label = new JSLabel(srcValue.label.Val());
+        OP_BRANCH(srcValue.getLabel());
         //programCounter.Push(srcValue.label, (long) vPC); //commented because I'm unsure if this opcode will have a corresponding joint
         // end modified code
         if (srcValue != vPC[2].u.jsCell.get()) {
@@ -4078,7 +4085,8 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		op_label = new JSLabel(src1.label.Join(src2.label).Val());
+		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
 //        if (!(programCounter.Loc() == (long)vPC))
 //            programCounter.Push(src1.label.Join(src2.label), (long) vPC);
 #if LDEBUG
@@ -4114,7 +4122,8 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		op_label = new JSLabel(src1.label.Join(src2.label).Val());
+		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
 //        if (!(programCounter.Loc() == (long)vPC))
 //            programCounter.Push(src1.label.Join(src2.label), (long) vPC);
 #if LDEBUG
@@ -4147,7 +4156,8 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		op_label = new JSLabel(src1.label.Join(src2.label).Val());
+		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
 //        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
 #if LDEBUG
         JPRINT("jumping if not less");
@@ -4178,7 +4188,8 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		op_label = new JSLabel(src1.label.Join(src2.label).Val());
+		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
 //        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
 #if LDEBUG
         JPRINT("jumping if less");
@@ -4209,7 +4220,8 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		op_label = new JSLabel(src1.label.Join(src2.label).Val());
+		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
 //        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
 #if LDEBUG
         JPRINT("jumping if not less or eq");
@@ -4240,7 +4252,8 @@ skip_id_custom_self:
         CHECK_FOR_EXCEPTION();
        
         // begin modified code
-		op_label = new JSLabel(src1.label.Join(src2.label).Val());
+		//op_label = new JSLabel(src1.label.Join(src2.label).Val());
+        OP_BRANCH(src1.joinLabel(src2.getLabel()));
 //        programCounter.Push(src1.label.Join(src2.label), (long) vPC);
 #if LDEBUG
         JPRINT("jumping if less or eq");

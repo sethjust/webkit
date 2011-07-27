@@ -13,11 +13,12 @@ namespace JSC {
 	
 	ProgramCounter::ProgramCounter() {
 		node = new PCNode(NULL, JSLabel(), NULL);
+    len = 0;
 	}
 	
 	void ProgramCounter::Push(JSLabel l, int i) {
 		// TODO: have this join labels appropriately
-		node = new PCNode(node, l, i);
+		node = new PCNode(node, Head().Join(l), i);
 		len++;
 	}
 	
