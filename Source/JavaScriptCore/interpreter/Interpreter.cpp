@@ -28,7 +28,7 @@
  */
 
 //defines for debugging label propogation
-#define LDEBUG 1
+#define LDEBUG true
 #define JPRINT(msg) printf("%s at %lx. PC has length %d and head %lx\n", msg, (long)vPC, programCounter.Len(), programCounter.Head().Val());
 //end debugging defines
 
