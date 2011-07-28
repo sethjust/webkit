@@ -65,7 +65,7 @@ namespace JSC {
         case op_jeq_null:
         case op_jneq_null:
           add_edge(pos, pos + vPC[2].u.operand);
-          add_edge(pos, pos+length);
+          add_edge(pos, pos + length);
           break;
 
         // Conditional w/ single offset in vPC[3]
@@ -77,17 +77,50 @@ namespace JSC {
         case op_jnlesseq:
         case op_jlesseq:
           add_edge(pos, pos + vPC[3].u.operand);
-          add_edge(pos, pos+length);
+          add_edge(pos, pos + length);
           break;
 
-        // TODO: Switch tables need special treatment
-        /*
-        case op_switch_imm:
-        case op_switch_char:
-        case op_switch_string:
-         */
+        // Property name interator stores offset in vPC[6]
+        case op_next_pname:
+          add_edge(pos, pos + vPC[6].u.operand);
+          add_edge(pos, pos + length);
+          break;
 
-        // TODO: op_next_pname (and others that jump?)
+
+        // Macro to loop over a SimpleJumpTable, as in CodeBlock::dump()
+        #define ADD_SWITCH_EDGES() \
+        Vector<int32_t>::const_iterator end = table.branchOffsets.end(); \
+        for (Vector<int32_t>::const_iterator iter = table.branchOffsets.begin(); iter != end; ++iter) { \
+          if (!*iter) \
+            continue; \
+          add_edge(pos, pos + *iter); \
+        }
+
+        // Switches have jump table index in vPC[1] and default target in vPC[2]
+        case op_switch_imm: {
+          SimpleJumpTable table = codeBlock->immediateSwitchJumpTable(vPC[1].u.operand);
+          ADD_SWITCH_EDGES();
+          add_edge(pos, pos + vPC[2].u.operand);
+          break;
+        }
+
+        case op_switch_char: {
+          SimpleJumpTable table = codeBlock->characterSwitchJumpTable(vPC[1].u.operand);
+          ADD_SWITCH_EDGES();
+          add_edge(pos, pos + vPC[2].u.operand);
+          break;
+        }
+
+        // String Switches use a different type for storing the table, so our macro doesn't work
+        case op_switch_string: {
+          StringJumpTable table = codeBlock->stringSwitchJumpTable(vPC[1].u.operand);
+          StringJumpTable::StringOffsetTable::const_iterator end = table.offsetTable.end();
+          for ( StringJumpTable::StringOffsetTable::const_iterator iter = table.offsetTable.begin(); iter != end; ++iter) {
+            add_edge(pos, pos + iter->second.branchOffset);
+          }
+          add_edge(pos, pos + vPC[2].u.operand);
+          break;
+        }
 
         // End of method
         case op_end:

@@ -29,7 +29,7 @@
 
 //defines for debugging label propogation
 #define LDEBUG true
-#define UDEBUG true
+#define UDEBUG false
 #define JPRINT(msg) printf("%s at location %d. PC has length %d and head %lx\n", msg, (int) (vPC - codeBlock->instructions().begin()), programCounter.Len(), programCounter.Head().Val());
 //end debugging defines
 
@@ -4282,6 +4282,14 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
+
+        // begin modified code
+#if LDEBUG
+        JPRINT("switching with immediate value");
+#endif
+        OP_BRANCH(scrutinee.getLabel());
+        // end modified code
+
         if (scrutinee.isInt32())
             vPC += codeBlock->immediateSwitchJumpTable(tableIndex).offsetForValue(scrutinee.asInt32(), defaultOffset);
         else {
@@ -4306,6 +4314,14 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
+
+        // begin modified code
+#if LDEBUG
+        JPRINT("switching on character");
+#endif
+        OP_BRANCH(scrutinee.getLabel());
+        // end modified code
+
         if (!scrutinee.isString())
             vPC += defaultOffset;
         else {
@@ -4329,6 +4345,14 @@ skip_id_custom_self:
         int tableIndex = vPC[1].u.operand;
         int defaultOffset = vPC[2].u.operand;
         JSValue scrutinee = callFrame->r(vPC[3].u.operand).jsValue();
+
+        // begin modified code
+#if LDEBUG
+        JPRINT("switching on string");
+#endif
+        OP_BRANCH(scrutinee.getLabel());
+        // end modified code
+
         if (!scrutinee.isString())
             vPC += defaultOffset;
         else 
@@ -5163,7 +5187,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_get_pnames);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_next_pname) { // TODO: see how this needs instrumentation
+    DEFINE_OPCODE(op_next_pname) {
         /* next_pname dst(r) base(r) i(n) size(n) iter(r) target(offset)
 
            Copies the next name from the property name list in
@@ -5177,6 +5201,14 @@ skip_id_custom_self:
         int size = vPC[4].u.operand;
         int iter = vPC[5].u.operand;
         int target = vPC[6].u.operand;
+
+        // begin modified code
+#if LDEBUG
+        JPRINT("looping over property names");
+#endif
+        OP_BRANCH(callFrame->r(base).jsValue().joinLabel(callFrame->r(iter).jsValue().getLabel())); //TODO: Make sure this is the right label
+        // end modified code
+
 
         JSPropertyNameIterator* it = callFrame->r(iter).propertyNameIterator();
         while (callFrame->r(i).i() != callFrame->r(size).i()) {
