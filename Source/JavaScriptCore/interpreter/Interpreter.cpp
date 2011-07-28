@@ -5149,7 +5149,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_pop_scope);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_get_pnames) { //TODO: I'm totally unsure that this doesn't need more work
+    DEFINE_OPCODE(op_get_pnames) {
         /* get_pnames dst(r) base(r) i(n) size(n) breakTarget(offset)
 
            Creates a property name list for register base and puts it
@@ -5163,6 +5163,14 @@ skip_id_custom_self:
         int breakTarget = vPC[5].u.operand;
 
         JSValue v = callFrame->r(base).jsValue();
+
+        // begin modified code
+#if LDEBUG
+        JPRINT("getting pnames");
+#endif
+        OP_BRANCH(v.getLabel());
+        // end modified code
+
         if (v.isUndefinedOrNull()) {
             vPC += breakTarget;
             NEXT_INSTRUCTION();
@@ -5181,6 +5189,8 @@ skip_id_custom_self:
         // begin modified code
         callFrame->uncheckedR(dst).jsValue().updateLabel(v);
         callFrame->uncheckedR(dst).jsValue().updateLabel(programCounter.Head());
+        callFrame->uncheckedR(i).jsValue().updateLabel(v);
+        callFrame->uncheckedR(i).jsValue().updateLabel(programCounter.Head());
         callFrame->uncheckedR(size).jsValue().updateLabel(v);
         callFrame->uncheckedR(size).jsValue().updateLabel(programCounter.Head());
         // end modified code

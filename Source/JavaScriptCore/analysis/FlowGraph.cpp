@@ -52,10 +52,7 @@ namespace JSC {
       int length = opcodeLengths[vPC->u.opcode];
 
       switch (opcode) {
-        // Unconditional w/ offset in vPC[1]
-        case op_jmp: 
-          add_edge(pos, pos + vPC[1].u.operand);
-          break;
+        //----------- CONDITIONAL JUMPS (I.E. BRANCHES) -----------//
 
         // Conditional w/ single offset in vPC[2]
         case op_loop_if_true:
@@ -80,12 +77,17 @@ namespace JSC {
           add_edge(pos, pos + length);
           break;
 
+        // Property name getter may branch; stores offset in vPC[5]
+        case op_get_pnames:
+          add_edge(pos, pos + vPC[5].u.operand);
+          add_edge(pos, pos + length);
+          break;
+
         // Property name interator stores offset in vPC[6]
         case op_next_pname:
           add_edge(pos, pos + vPC[6].u.operand);
           add_edge(pos, pos + length);
           break;
-
 
         // Macro to loop over a SimpleJumpTable, as in CodeBlock::dump()
         #define ADD_SWITCH_EDGES() \
@@ -121,6 +123,22 @@ namespace JSC {
           add_edge(pos, pos + vPC[2].u.operand);
           break;
         }
+
+        //----------- UNCONDITIONAL JUMPS -----------//
+
+        // Unconditional w/ offset in vPC[1]
+        case op_jmp: 
+        case op_loop:
+          add_edge(pos, pos + vPC[1].u.operand);
+          break;
+          
+        // Unconditional w/ offset in vPC[2]
+        case op_jmp_scopes:
+        case op_jsr:
+          add_edge(pos, pos + vPC[2].u.operand);
+          break;
+
+        //----------- OTHER OPCODES -----------//
 
         // End of method
         case op_end:
