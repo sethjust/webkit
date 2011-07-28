@@ -1532,10 +1532,10 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
     unsigned tickCount = globalData->timeoutChecker.ticksUntilNextCheck();
     JSValue functionReturnValue;
 	
-	// Start our code
+    // Start our code
     // Perform static analysis
     StaticAnalyzer analyzer = StaticAnalyzer();
-	analyzer.genContextTable(codeBlock);
+    analyzer.genContextTable(codeBlock);
     // End our code
 
 #define CHECK_FOR_EXCEPTION() \
@@ -4748,7 +4748,7 @@ skip_id_custom_self:
         vPC += OPCODE_LENGTH(op_tear_off_arguments);
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_ret) { //instrument - context // TODO: pop programcounter once we have calls pushing
+    DEFINE_OPCODE(op_ret) { //instrument - context // TODO: something here
         /* ret result(r)
            
            Return register result as the return value of the current
