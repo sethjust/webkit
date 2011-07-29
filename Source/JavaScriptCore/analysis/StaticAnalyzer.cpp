@@ -11,7 +11,7 @@
 #include "CodeBlock.h"
 #include "Instruction.h"
 
-#define ADEBUG true
+#define ADEBUG false
 
 namespace JSC {
 
@@ -50,16 +50,47 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   for (int i=0; i<count; i++) { number[i] = semi[i]; }
 
   // Calculate semidominators
+  /* sdom[w] = min(
+      {v|(w,v)\inE and v<w}
+      U
+      {sdom(u)|u>w and \exists (w,v)\inE s.t. u is a proper ancestor of v in the DFS tree}
+     ) 
+     where E is the set of edges in the CFG
+     and where min, < and > are comparisons of numbers arising from DFS
+   */
   for (int i=lastIdx; i>1; i--) {
     int node = vertex[i];
-    int minv = i;
+    int minv = lastIdx;
 
     AListNode* current = graph.Head();
     while (current) {
       edge_t* edge = current->edge();
-      if (edge->from == node){
-        if (semi[edge->to] < minv) {
+      if (edge->from == node){ // We've found an edge leaving the node we're examining
+        
+        // First case of definition
+        if ( (number[node]>number[edge->to]) & (semi[edge->to] < minv)) { // note that number[node]==i
           minv = semi[edge->to];
+        }
+
+        // Now we traverse up the DFS to check the second case of definition
+        int cnode = edge->to;
+        while (1) {        
+          // Loop over list of edges to find the parent of cnode in DFS
+          AListNode* current2 = graph.Head();
+          while (current2) {
+            edge_t* edge2 = current2->edge();
+            if ((edge2->from == cnode) & (edge2->inDFS)) {
+              cnode = edge2->to; // Step to parent in DFS
+              break;
+            }
+            current2 = current2->next();
+          }
+          
+          if ((number[node]<number[cnode]) & semi[cnode] < minv) {
+            minv = semi[cnode];
+          }
+          
+          if (number[cnode]==1) break;
         }
       }
 

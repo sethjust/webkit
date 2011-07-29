@@ -4492,7 +4492,7 @@ skip_id_custom_self:
             CallFrame* previousCallFrame = callFrame;
             CodeBlock* newCodeBlock = &callData.js.functionExecutable->generatedBytecodeForCall();
             // ---- Instrumentation ----
-            newCodeBlock->analyzer.genContextTable(newCodeBlock);
+            newCodeBlock->analyzer.genContextTable(newCodeBlock); //TODO: Only call this once per codeblock, if that is possible (it isn't if we recompile with each call)
 			
 #if LDEBUG
             JPRINT("calling function");
@@ -5347,6 +5347,11 @@ skip_id_custom_self:
            program. Return control to the calling native code.
         */
 
+        // Start modified code
+#if LDEBUG
+        JPRINT("ending");
+#endif
+        // End modified code
         int result = vPC[1].u.operand;
         return callFrame->r(result).jsValue();
     }
