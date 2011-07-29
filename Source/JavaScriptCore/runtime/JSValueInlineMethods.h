@@ -27,8 +27,11 @@
 #define JSValueInlineMethods_h
 
 #include "JSValue.h"
+#include "URLMap.h"
 
 namespace JSC {
+	
+	
 
     ALWAYS_INLINE int32_t JSValue::toInt32(ExecState* exec) const
     {
@@ -189,36 +192,60 @@ namespace JSC {
     {
         u.asBits.tag = EmptyValueTag;
         u.asBits.payload = 0;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::JSValue(JSNullTag)
     {
         u.asBits.tag = NullTag;
         u.asBits.payload = 0;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
     
     inline JSValue::JSValue(JSUndefinedTag)
     {
         u.asBits.tag = UndefinedTag;
         u.asBits.payload = 0;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
     
     inline JSValue::JSValue(JSTrueTag)
     {
         u.asBits.tag = BooleanTag;
         u.asBits.payload = 1;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
     
     inline JSValue::JSValue(JSFalseTag)
     {
         u.asBits.tag = BooleanTag;
         u.asBits.payload = 0;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::JSValue(HashTableDeletedValueTag)
     {
         u.asBits.tag = DeletedValueTag;
         u.asBits.payload = 0;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::JSValue(JSCell* ptr)
@@ -231,6 +258,10 @@ namespace JSC {
 #if ENABLE(JSC_ZOMBIES)
         ASSERT(!isZombie());
 #endif
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::JSValue(const JSCell* ptr)
@@ -243,6 +274,10 @@ namespace JSC {
 #if ENABLE(JSC_ZOMBIES)
         ASSERT(!isZombie());
 #endif
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::operator bool() const
@@ -338,6 +373,10 @@ namespace JSC {
     {
         u.asBits.tag = Int32Tag;
         u.asBits.payload = i;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline bool JSValue::isNumber() const
@@ -387,6 +426,10 @@ namespace JSC {
 #if ENABLE(JSC_ZOMBIES)
         ASSERT(!isZombie());
 #endif
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::JSValue(const JSCell* ptr)
@@ -395,6 +438,10 @@ namespace JSC {
 #if ENABLE(JSC_ZOMBIES)
         ASSERT(!isZombie());
 #endif
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::operator bool() const
@@ -452,21 +499,37 @@ namespace JSC {
     inline JSValue::JSValue(JSNullTag)
     {
         u.asInt64 = ValueNull;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
     
     inline JSValue::JSValue(JSUndefinedTag)
     {
         u.asInt64 = ValueUndefined;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::JSValue(JSTrueTag)
     {
         u.asInt64 = ValueTrue;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::JSValue(JSFalseTag)
     {
         u.asInt64 = ValueFalse;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline bool JSValue::isUndefinedOrNull() const
@@ -502,11 +565,19 @@ namespace JSC {
     ALWAYS_INLINE JSValue::JSValue(EncodeAsDoubleTag, double d)
     {
         u.asInt64 = reinterpretDoubleToIntptr(d) + DoubleEncodeOffset;
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline JSValue::JSValue(int i)
     {
         u.asInt64 = TagTypeNumber | static_cast<uint32_t>(i);
+		// -----------Instrumentation----------- //
+		label = JSLabel(URLMap::urlmap().lastAsVal());
+		synced = false;
+		// ------------------------------------- //
     }
 
     inline double JSValue::asDouble() const

@@ -9,6 +9,7 @@
 
 #include "config.h"
 #include "JSLabel.h"
+//#include "URLMap.h"
 
 namespace JSC {
 	
@@ -16,6 +17,7 @@ namespace JSC {
 	JSLabel::JSLabel() {
 		label = new long;
 		*label = 0;
+		//*label = URLMap::urlmap().lastAsVal();
 	}
 	
 	// JSLabel constructor overload; Takes value
@@ -31,7 +33,7 @@ namespace JSC {
 	
 	// return new label with OR'd vals
 	JSLabel JSLabel::Join(JSLabel l) {
-		return *new JSLabel(l.Val() | this->Val());
+		return JSLabel(l.Val() | this->Val());
 	}
 	
 }
