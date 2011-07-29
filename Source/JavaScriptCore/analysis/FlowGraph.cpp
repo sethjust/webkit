@@ -142,6 +142,7 @@ namespace JSC {
 
         // End of method
         case op_end:
+        case op_ret:
           //add_edge(pos, pos); // TODO: mark end node better?
           break;
 

@@ -12,8 +12,9 @@
 namespace JSC {
 	
 	ProgramCounter::ProgramCounter() {
-		node = new PCNode(NULL, JSLabel(), NULL);
-    len = 0;
+		//Location is set to -1 to ensure we never pop the sentinel node, as we will never execute the opcode at location -1
+		node = new PCNode(NULL, JSLabel(), -1);
+		len = 0;
 	}
 	
 	void ProgramCounter::Push(JSLabel l, int i) {
