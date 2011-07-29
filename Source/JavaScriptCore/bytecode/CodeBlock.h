@@ -43,6 +43,10 @@
 #include <wtf/RefPtr.h>
 #include <wtf/Vector.h>
 
+// ---- Instrumentation ----
+#include "StaticAnalyzer.h"
+// -------------------------
+
 #if ENABLE(JIT)
 #include "StructureStubInfo.h"
 #endif
@@ -209,6 +213,10 @@ namespace JSC {
         Heap* m_heap;
 
     public:
+        // ---- Instrumentation ----
+        StaticAnalyzer analyzer;
+        // -------------------------
+        
         virtual ~CodeBlock();
 
         void visitAggregate(SlotVisitor&);

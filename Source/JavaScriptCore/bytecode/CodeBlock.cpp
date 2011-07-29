@@ -1384,6 +1384,10 @@ CodeBlock::CodeBlock(ScriptExecutable* ownerExecutable, CodeType codeType, JSGlo
 #if DUMP_CODE_BLOCK_STATISTICS
     liveCodeBlockSet.add(this);
 #endif
+
+    // ---- Instrumentation ----
+    analyzer = StaticAnalyzer();
+    // -------------------------
 }
 
 CodeBlock::~CodeBlock()

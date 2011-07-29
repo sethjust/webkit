@@ -773,10 +773,10 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
     newCallFrame->init(codeBlock, 0, scopeChain, CallFrame::noCaller(), codeBlock->m_numParameters, 0);
     newCallFrame->uncheckedR(newCallFrame->hostThisRegister()) = JSValue(thisObj);
 	
-	// -----------Instrumentation----------- //
-	URLMap::urlmap().put(program->sourceURL().utf8().data());
-	if (UDEBUG) printf("Putting %s in url map from PROGRAM execute\n", program->sourceURL().utf8().data());
-	// ------------------------------------- //
+    // -----------Instrumentation----------- //
+    URLMap::urlmap().put(program->sourceURL().utf8().data());
+    if (UDEBUG) printf("Putting %s in url map from PROGRAM execute\n", program->sourceURL().utf8().data());
+    // ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
     if (*profiler)
@@ -1534,8 +1534,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 	
     // Start our code
     // Perform static analysis
-    StaticAnalyzer analyzer = StaticAnalyzer();
-    analyzer.genContextTable(codeBlock);
+    codeBlock->analyzer.genContextTable(codeBlock);
     // End our code
 
 #define CHECK_FOR_EXCEPTION() \
@@ -1552,7 +1551,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
 
 // -----------	----------- //
 #define OP_BRANCH(op_label) \
-	int IPD = analyzer.IDom((int) (vPC - codeBlock->instructions().begin())); \
+	int IPD = codeBlock->analyzer.IDom((int) (vPC - codeBlock->instructions().begin())); \
   if (programCounter.Loc() == IPD) { \
     programCounter.Join(op_label); \
     if (LDEBUG) printf("Joining label %lx to PC at location %d with IPD %d\n", op_label.Val(), (int) (vPC - codeBlock->instructions().begin()), IPD); \
@@ -4492,6 +4491,14 @@ skip_id_custom_self:
 
             CallFrame* previousCallFrame = callFrame;
             CodeBlock* newCodeBlock = &callData.js.functionExecutable->generatedBytecodeForCall();
+            // ---- Instrumentation ----
+            newCodeBlock->analyzer.genContextTable(newCodeBlock);
+			
+#if LDEBUG
+            JPRINT("calling function");
+#endif
+            // -------------------------
+
             callFrame = slideRegisterWindowForCall(newCodeBlock, registerFile, callFrame, registerOffset, argCount);
             if (UNLIKELY(!callFrame)) {
                 callFrame = previousCallFrame;
@@ -4757,6 +4764,12 @@ skip_id_custom_self:
            chain, code block instruction pointer and register base
            to those of the calling function.
         */
+
+        // Start modified code
+#if LDEBUG
+        JPRINT("returning from function");
+#endif
+        // End modified code
 
         int result = vPC[1].u.operand;
 

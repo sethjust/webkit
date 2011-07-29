@@ -167,7 +167,7 @@ namespace JSC {
     *curIdx = 1;
 
     bool visited[count];
-    for (int i=0; i<count; i++) {visited[i]=0;}
+    for (int i=0; i<count; i++) {visited[i]=false;}
     
     DFS((int) (codeBlock->instructions().end() - codeBlock->instructions().begin() - OPCODE_LENGTH(op_end)),
         vertex,

@@ -11,7 +11,7 @@
 #include "CodeBlock.h"
 #include "Instruction.h"
 
-#define ADEBUG false
+#define ADEBUG true
 
 namespace JSC {
 
