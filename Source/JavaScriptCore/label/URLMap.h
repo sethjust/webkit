@@ -11,6 +11,7 @@
 #define URLMap_h
 
 #include "URLEntry.h"
+#include "JSLabel.h"
 
 namespace JSC {
 	
@@ -29,6 +30,10 @@ namespace JSC {
 		const char* filter(const char*); // filter urls
 		inline bool capacity() { return (idx+1 < MAP_SIZE); }; // checks if the map is full
 		
+		JSLabel lastLabel;
+		int lastIdx;
+		void setLast(int);
+		
 	public: // puts/gets will be fed with program->sourceURL().utf8().data() from the interpretor (subject to change for functions and evals)
 		
 		// ctor, copy-ctor, and assignment opperators
@@ -41,6 +46,8 @@ namespace JSC {
 		void put(const char*); // puts script url string in map and generates a value
 		long head(); // returns JSLabel at head of map
 		char * sHead(); // return head as char* array
+		JSLabel lastAsLabel();
+		long lastAsVal();
 		~URLMap(); // deconstructor
 	};
 	

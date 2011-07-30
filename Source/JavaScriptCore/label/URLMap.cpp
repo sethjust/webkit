@@ -23,6 +23,8 @@ namespace JSC {
 		// these are put manually for quick initialization and to avoid filter exceptions
 		map[0] = new URLEntry("!", 1); // fallback given when map is full
 		map[1] = new URLEntry("NULL", 2); // create generic value for NULL urls
+		lastIdx = 0;
+		setLast(1); // initialize the last label
 	}
 	
 	URLMap& URLMap::urlmap() {
@@ -38,6 +40,7 @@ namespace JSC {
 		// NOTE: any call to append should check capacity() first
 		idx++; // move current map lcoation
 		map[idx] = new URLEntry(url, (long)2<<idx-1); // set map head to new URLEntry
+		setLast(idx);
 	}
 	
 	int URLMap::search(const char* url) { // is the url already in the map?
@@ -61,14 +64,26 @@ namespace JSC {
 		}
 	}
 	
+	void URLMap::setLast(int i) {
+		if (lastIdx != i) {
+			lastIdx = i;
+			long temp = map[lastIdx]->getValue();
+			lastLabel = JSLabel(temp);
+		}
+	}
+	
 	// -----------Public----------- //
 	
 	void URLMap::put(const char* url) { // put url on map
 		url = strdup(filter(url));
-		if (search(url) == OUT_OF_BOUNDS) { // if the url's not in the map add it
+		int loc = search(url);
+		if (loc == OUT_OF_BOUNDS) { // if the url's not in the map add it
 			if (capacity()) { // is the map full?
 				append(url);
 			}
+		}
+		else {
+			setLast(loc);
 		}
 	}
 	
@@ -97,6 +112,14 @@ namespace JSC {
 		char* temp;
 		sprintf(temp, "%ld", URLMap::urlmap().head());
 		return temp;
+	}
+	
+	JSLabel URLMap::lastAsLabel() {
+		return lastLabel;
+	}
+	
+	long URLMap::lastAsVal() {
+		return lastLabel.Val();
 	}
 	
 	URLMap::~URLMap() { // deconstructor

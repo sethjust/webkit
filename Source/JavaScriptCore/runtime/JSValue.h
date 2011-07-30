@@ -244,6 +244,8 @@ namespace JSC {
     private:
 		// -----------Instrumentation----------- //
 		JSLabel label; // Added JSLabel attribute for info flow tracking
+		bool synced;
+		void syncLabel();
 		// ------------------------------------- //
 		
         template <class T> JSValue(WriteBarrierBase<T>);

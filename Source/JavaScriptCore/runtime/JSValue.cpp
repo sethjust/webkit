@@ -39,20 +39,21 @@ namespace JSC {
 static const double D32 = 4294967296.0;
     
 // -----------Instrumentation----------- //
-    
-/* depreciated
-void JSValue::updateLabel(JSValue other) {
-    label = label.Join(other.label);
-}
-void JSValue::updateLabel(JSLabel other) {
-    label = label.Join(other);
-}
- */
+    void JSValue:: syncLabel() {
+	if (label.Val() != asCell()->getLabel().Val()) {
+	    printf("syncing values\n");
+	    asCell()->setLabel(label.Join(asCell()->getLabel()));
+	}
+	synced = true;
+    }
     
 // fallbacks use local label
     // should they check if the value has become a cell?
 JSLabel JSValue::getLabel() {
     if (isCell()) {
+	if (!synced) {
+	    syncLabel();
+	}
 	return asCell()->getLabel();
     }
     return label;
@@ -60,6 +61,7 @@ JSLabel JSValue::getLabel() {
     
 void JSValue::setLabel(JSLabel l) {
     if (isCell()) {
+	synced = true;
 	asCell()->setLabel(l);
     }
     else {
@@ -69,6 +71,9 @@ void JSValue::setLabel(JSLabel l) {
     
 JSLabel JSValue::joinLabel(JSLabel l) {
     if (isCell()) {
+	if (!synced) {
+	    syncLabel();
+	}
 	return asCell()->joinLabel(l);
     }
     return label.Join(l);

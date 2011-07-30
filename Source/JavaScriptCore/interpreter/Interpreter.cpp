@@ -29,7 +29,6 @@
 
 //defines for debugging label propogation
 #define LDEBUG true
-#define UDEBUG false
 #define JPRINT(msg) printf("%s at location %d. PC has length %d and head %lx\n", msg, (int) (vPC - codeBlock->instructions().begin()), programCounter.Len(), programCounter.Head().Val());
 //end debugging defines
 
@@ -775,7 +774,6 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
 	
     // -----------Instrumentation----------- //
     URLMap::urlmap().put(program->sourceURL().utf8().data());
-    if (UDEBUG) printf("Putting %s in url map from PROGRAM execute\n", program->sourceURL().utf8().data());
     // ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
@@ -805,6 +803,7 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
 
     m_registerFile.shrink(oldEnd);
 	
+	/*
 	// -----------Instrumentation----------- //
 	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	result.setLabel(URLMap::urlmap().head());
@@ -814,6 +813,7 @@ JSValue Interpreter::execute(ProgramExecutable* program, CallFrame* callFrame, S
 		printf("JSValue label has value %lx after assignment\n", result.getLabel().Val());
 	}
 	// ------------------------------------- //
+	 */
 
     return checkedReturn(result);
 }
@@ -864,7 +864,6 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
 		
 		// -----------Instrumentation----------- //
 		URLMap::urlmap().put(static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data());
-		if (UDEBUG) printf("Putting %s in url map from FUNCTION execute\n", static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data());
 		// ------------------------------------- //
 
         Profiler** profiler = Profiler::enabledProfilerReference();
@@ -902,6 +901,11 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
     Profiler** profiler = Profiler::enabledProfilerReference();
     if (*profiler)
         (*profiler)->willExecute(callFrame, function);
+	
+	// -----------Instrumentation----------- //
+	// this causes a segmentation fault...
+	//URLMap::urlmap().put(static_cast<JSFunction*>(function)->jsExecutable()->sourceURL().utf8().data());
+	// ------------------------------------- //
 
     JSValue result;
     {
@@ -914,6 +918,7 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
 
     m_registerFile.shrink(oldEnd);
 	
+	/*
 	// -----------Instrumentation----------- //
 	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	result.setLabel(URLMap::urlmap().head());
@@ -923,6 +928,7 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
 		printf("JSValue label has value %lx after assignment\n", result.getLabel().Val());
 	}
 	// ------------------------------------- //
+	 */
 	
     return checkedReturn(result);
 }
@@ -1188,7 +1194,6 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
 	
 	// -----------Instrumentation----------- //
 	URLMap::urlmap().put(eval->sourceURL().utf8().data());
-	if (UDEBUG) printf("Putting %s in url map from EVAL execute\n", eval->sourceURL().utf8().data());
 	// ------------------------------------- //
 
     Profiler** profiler = Profiler::enabledProfilerReference();
@@ -1222,6 +1227,8 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
     m_registerFile.shrink(oldEnd);
     if (pushedScope)
         scopeChain->pop();
+	
+	/*
 	// -----------Instrumentation----------- //
 	//result.label = URLMap::urlmap().head(); // the head should still be the associated label
 	result.setLabel(URLMap::urlmap().head());
@@ -1231,6 +1238,8 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSObjec
 		printf("JSValue label has value %lx after assignment\n", result.getLabel().Val());
 	}
 	// ------------------------------------- //
+	 */
+	
     return checkedReturn(result);
 }
 

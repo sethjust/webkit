@@ -615,3 +615,7 @@ _kJSClassDefinitionEmpty
 __ZNK3JSC7JSLabel3ValEv
 __ZN3JSC7JSLabelC1Ev
 __ZN3JSC7JSValue8getLabelEv
+__ZN3JSC6URLMap9lastAsValEv
+__ZN3JSC6URLMap6urlmapEv
+__ZN3JSC7JSLabelC1El
+
