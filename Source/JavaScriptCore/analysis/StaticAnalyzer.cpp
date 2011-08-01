@@ -11,7 +11,7 @@
 #include "CodeBlock.h"
 #include "Instruction.h"
 
-#define ADEBUG false
+#define ADEBUG true
 
 namespace JSC {
 
@@ -22,7 +22,7 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
   // Generate the CFG
   FlowGraph graph = FlowGraph(codeBlock);
   
-  int count = graph.count;
+  count = graph.count;
 
   // Create arrays to hold information from DFS. Note we need to initialize every entry to 0
   int semi[count];
@@ -74,7 +74,14 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
 
         // Now we traverse up the DFS to check the second case of definition
         int cnode = edge->to;
-        while (1) {        
+        while (1) {  
+          
+          if ((number[node]<number[cnode]) & semi[cnode] < minv) {
+            minv = semi[cnode];
+          }
+          
+          if (number[cnode]==1) break;
+          
           // Loop over list of edges to find the parent of cnode in DFS
           AListNode* current2 = graph.Head();
           while (current2) {
@@ -85,12 +92,7 @@ void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
             }
             current2 = current2->next();
           }
-          
-          if ((number[node]<number[cnode]) & semi[cnode] < minv) {
-            minv = semi[cnode];
-          }
-          
-          if (number[cnode]==1) break;
+
         }
       }
 

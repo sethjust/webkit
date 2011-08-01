@@ -45,7 +45,7 @@ namespace JSC {
     Instruction* vPC = begin;
 
     //    count = codeBlock->instructionCount();    
-    count = (int) (codeBlock->instructions().end() - codeBlock->instructions().begin());
+    count = (int) (codeBlock->instructions().end() - codeBlock->instructions().begin()) + 1;
 
     // Loop over opcodes to build CFG
     while (vPC < codeBlock->instructions().end()) {
@@ -145,7 +145,7 @@ namespace JSC {
         // End of method
         case op_end:
         case op_ret:
-          //add_edge(pos, pos); // TODO: mark end node better?
+          add_edge(pos, count-1); // edge to synthetic node
           break;
 
         // Non-jumping/branching opcodes
@@ -171,7 +171,7 @@ namespace JSC {
     bool visited[count];
     for (int i=0; i<count; i++) {visited[i]=false;}
     
-    DFS((int) (codeBlock->instructions().end() - codeBlock->instructions().begin() - OPCODE_LENGTH(op_end)),
+    DFS(count-1,
         vertex,
         curIdx,
         semi,

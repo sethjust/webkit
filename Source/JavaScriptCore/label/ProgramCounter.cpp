@@ -13,12 +13,12 @@ namespace JSC {
 	
 	ProgramCounter::ProgramCounter() {
 		//Location is set to -1 to ensure we never pop the sentinel node, as we will never execute the opcode at location -1
-		node = new PCNode(NULL, JSLabel(), -1);
+		node = new PCNode(NULL, JSLabel(), -1, NULL);
 		len = 0;
 	}
 	
-	void ProgramCounter::Push(JSLabel l, int i) {
-		node = new PCNode(node, Head().Join(l), i);
+	void ProgramCounter::Push(JSLabel l, int i, Register* r) {
+		node = new PCNode(node, Head().Join(l), i, r);
 		len++;
 	}
 	
@@ -41,6 +41,10 @@ namespace JSC {
 	}
 	
 	void ProgramCounter::Join(JSLabel label) {
-		node = new PCNode(node->Next(), node->Val().Join(label), node->Loc());
+		node = new PCNode(node->Next(), node->Val().Join(label), node->Loc(), node->reg);
+	}
+	
+	Register* ProgramCounter::Reg() {
+		return node->reg;
 	}
 }

@@ -15,18 +15,20 @@
 #include "PCNode.h"
 
 namespace JSC {
+	class Register;
 	
 	class ProgramCounter {
 		PCNode *node; // current node
 		int len;
 	public:
 		ProgramCounter(); // constructor
-		void Push(JSLabel, int); // push node to stack
+		void Push(JSLabel, int, Register*); // push node to stack
 		void Pop(); // remove and return head
 		JSLabel Head(); // return head
 		int Loc();
 		int Len();
 		void Join(JSLabel);
+		Register* Reg();
 	};
 }
 

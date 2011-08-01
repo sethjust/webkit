@@ -24,6 +24,7 @@ public:
   StaticAnalyzer();
   void genContextTable(CodeBlock*);
   int IDom(int node) { return idom[node]; }
+  int count;
 };
 
 }

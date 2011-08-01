@@ -13,6 +13,7 @@
 #include "JSLabel.h"
 
 namespace JSC {
+	class Register;
 
 	class PCNode {
 		PCNode *node; // pointer to previous node
@@ -20,10 +21,11 @@ namespace JSC {
 		int loc;
 		
 	public:
-		PCNode(PCNode*, JSLabel, int); // constructor
+		PCNode(PCNode*, JSLabel, int, Register*); // constructor
 		PCNode* Next(); // next node (for pop)
 		JSLabel Val(); // return value
 		int Loc(); 
+		Register* reg;
 	};
 }
 

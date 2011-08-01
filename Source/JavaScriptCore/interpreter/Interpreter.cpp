@@ -1558,19 +1558,19 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
     OpcodeStats::resetLastInstruction();
 #endif
 
-// -----------	----------- //
+// ----------- Instrumentation	----------- //
 #define OP_BRANCH(op_label) \
 	int IPD = codeBlock->analyzer.IDom((int) (vPC - codeBlock->instructions().begin())); \
-  if (programCounter.Loc() == IPD) { \
+  if ((programCounter.Loc()==IPD) & (programCounter.Reg()==callFrame->registers())) { \
     programCounter.Join(op_label); \
     if (LDEBUG) printf("Joining label %lx to PC at location %d with IPD %d\n", op_label.Val(), (int) (vPC - codeBlock->instructions().begin()), IPD); \
   } else { \
-    programCounter.Push(op_label, IPD); \
+    programCounter.Push(op_label, IPD, callFrame->registers()); \
     if (LDEBUG) printf("Pushing label %lx to PC at location %d with IPD %d\n", op_label.Val(), (int) (vPC - codeBlock->instructions().begin()), IPD); \
   }
-	
+
 #define OP_MERGE() \
-	if (programCounter.Loc() == (int) (vPC - codeBlock->instructions().begin())) { \
+	if ((programCounter.Loc() == (int) (vPC - codeBlock->instructions().begin())) & (programCounter.Reg()==callFrame->registers())) { \
 		programCounter.Pop(); \
 		if (LDEBUG) printf("Popping label from PC at location %d\n", (int) (vPC - codeBlock->instructions().begin())); \
 	}
@@ -4506,6 +4506,7 @@ skip_id_custom_self:
 #if LDEBUG
             JPRINT("calling function");
 #endif
+			//Register* callFrame->registers() //unique identifier
             // -------------------------
 
             callFrame = slideRegisterWindowForCall(newCodeBlock, registerFile, callFrame, registerOffset, argCount);
@@ -4774,11 +4775,16 @@ skip_id_custom_self:
            to those of the calling function.
         */
 
-        // Start modified code
+		// -----------Instrumentation----------- //
 #if LDEBUG
         JPRINT("returning from function");
+		// we need to merge as if we're at location (codeBlock->analyzer.count - 1)
+		if ((programCounter.Loc() == codeBlock->analyzer.count - 1) & (programCounter.Reg()==callFrame->registers())) {
+			programCounter.Pop();
+			if (LDEBUG) printf("Popping label from PC at location %d\n", (int) (vPC - codeBlock->instructions().begin()));
+		}
 #endif
-        // End modified code
+		// ------------------------------------- //
 
         int result = vPC[1].u.operand;
 
