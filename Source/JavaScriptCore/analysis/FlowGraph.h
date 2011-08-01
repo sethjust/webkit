@@ -39,10 +39,11 @@ class AListNode {
 class FlowGraph {
   AListNode* head;
   CodeBlock* codeBlock;
-  int count;
   void add_edge( int from, int to);
   void DFS(int node, int vertex[], int* curIdx, int semi[], bool visited[]);
+  
   public:
+    int count;
     AListNode* Head() { return head; }
     FlowGraph(CodeBlock* cb);
     CodeBlock* code_block() { return codeBlock; }

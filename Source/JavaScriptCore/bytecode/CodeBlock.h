@@ -44,7 +44,9 @@
 #include <wtf/Vector.h>
 
 // ---- Instrumentation ----
+#ifndef StaticAnalyzer_h
 #include "StaticAnalyzer.h"
+#endif
 // -------------------------
 
 #if ENABLE(JIT)

@@ -19,10 +19,10 @@ StaticAnalyzer::StaticAnalyzer(){
 }
 
 void StaticAnalyzer::genContextTable(CodeBlock* codeBlock) {
-  int count = codeBlock->instructionCount();
-
   // Generate the CFG
   FlowGraph graph = FlowGraph(codeBlock);
+  
+  int count = graph.count;
 
   // Create arrays to hold information from DFS. Note we need to initialize every entry to 0
   int semi[count];

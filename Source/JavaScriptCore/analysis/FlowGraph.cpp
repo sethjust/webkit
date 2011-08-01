@@ -39,11 +39,13 @@ namespace JSC {
     // Initialize instance variables
     codeBlock = cb;
     head = NULL;
-    count = codeBlock->instructionCount();
-    
+
     // Initialize locals
     Instruction* begin = codeBlock->instructions().begin();
     Instruction* vPC = begin;
+
+    //    count = codeBlock->instructionCount();    
+    count = (int) (codeBlock->instructions().end() - codeBlock->instructions().begin());
 
     // Loop over opcodes to build CFG
     while (vPC < codeBlock->instructions().end()) {
