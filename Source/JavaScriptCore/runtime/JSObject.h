@@ -750,14 +750,15 @@ inline JSValue JSObject::toPrimitive(ExecState* exec, PreferredPrimitiveType pre
     return defaultValue(exec, preferredType);
 }
 
-inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName) const
+inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, JSLabel* label=NULL) const
 {
     PropertySlot slot(asValue());
-    return get(exec, propertyName, slot);
+    return get(exec, propertyName, slot, label);
 }
 
-inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, PropertySlot& slot) const
+inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, PropertySlot& slot, JSLabel* label=NULL) const
 {
+	ASSERT(!label);
     if (UNLIKELY(!isCell())) {
         JSObject* prototype = synthesizePrototype(exec);
         if (propertyName == exec->propertyNames().underscoreProto)
@@ -777,14 +778,15 @@ inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, Pro
     }
 }
 
-inline JSValue JSValue::get(ExecState* exec, unsigned propertyName) const
+inline JSValue JSValue::get(ExecState* exec, unsigned propertyName, JSLabel* label=NULL) const
 {
     PropertySlot slot(asValue());
-    return get(exec, propertyName, slot);
+    return get(exec, propertyName, slot, label);
 }
 
-inline JSValue JSValue::get(ExecState* exec, unsigned propertyName, PropertySlot& slot) const
+inline JSValue JSValue::get(ExecState* exec, unsigned propertyName, PropertySlot& slot, JSLabel* label=NULL) const
 {
+	ASSERT(!label);
     if (UNLIKELY(!isCell())) {
         JSObject* prototype = synthesizePrototype(exec);
         if (!prototype->getPropertySlot(exec, propertyName, slot))

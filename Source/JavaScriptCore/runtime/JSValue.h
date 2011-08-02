@@ -210,10 +210,10 @@ namespace JSC {
         float toFloat(ExecState* exec) const { return static_cast<float>(toNumber(exec)); }
 
         // Object operations, with the toObject operation included.
-        JSValue get(ExecState*, const Identifier& propertyName) const;
-        JSValue get(ExecState*, const Identifier& propertyName, PropertySlot&) const;
-        JSValue get(ExecState*, unsigned propertyName) const;
-        JSValue get(ExecState*, unsigned propertyName, PropertySlot&) const;
+        JSValue get(ExecState*, const Identifier& propertyName, JSLabel*) const;
+        JSValue get(ExecState*, const Identifier& propertyName, PropertySlot&, JSLabel*) const;
+        JSValue get(ExecState*, unsigned propertyName, JSLabel*) const;
+        JSValue get(ExecState*, unsigned propertyName, PropertySlot&, JSLabel*) const;
         void put(ExecState*, const Identifier& propertyName, JSValue, PutPropertySlot&);
         void putDirect(ExecState*, const Identifier& propertyName, JSValue, PutPropertySlot&);
         void put(ExecState*, unsigned propertyName, JSValue);
