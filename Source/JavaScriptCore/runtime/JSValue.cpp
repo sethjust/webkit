@@ -64,9 +64,7 @@ void JSValue::setLabel(JSLabel l) {
 	synced = true;
 	asCell()->setLabel(l);
     }
-    else {
-	label = l;
-    }
+    label = l;
 }
     
 JSLabel JSValue::joinLabel(JSLabel l) {

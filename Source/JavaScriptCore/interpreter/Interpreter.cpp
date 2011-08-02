@@ -2936,7 +2936,12 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         Identifier& ident = codeBlock->identifier(property);
         JSValue baseValue = callFrame->r(base).jsValue();
         PropertySlot slot(baseValue);
-        JSValue result = baseValue.get(callFrame, ident, slot);
+        // -----------Instrumentation----------- //
+        JSLabel label = JSLabel(baseValue.getLabel().Val());
+        JSValue result = baseValue.get(callFrame, ident, slot, &label);
+        result.updateLabel(label);
+        result.updateLabel(programCounter.Head());
+        // ------------------------------------- //
         CHECK_FOR_EXCEPTION();
 
         tryCacheGetByID(callFrame, codeBlock, vPC, baseValue, ident, slot);
@@ -3748,19 +3753,28 @@ skip_id_custom_self:
                 result = asString(baseValue)->getIndex(callFrame, i);
             else if (isJSByteArray(globalData, baseValue) && asByteArray(baseValue)->canAccessIndex(i))
                 result = asByteArray(baseValue)->getIndex(callFrame, i);
-            else
-                result = baseValue.get(callFrame, i);
+            else {
+                // -----------Instrumentation----------- //
+                JSLabel label = JSLabel(baseValue.getLabel().Val());
+                result = baseValue.get(callFrame, i, &label);
+                result.updateLabel(label);
+                // ------------------------------------- //
+            }
         } else {
             Identifier property(callFrame, subscript.toString(callFrame));
-            result = baseValue.get(callFrame, property);
+            // -----------Instrumentation----------- //
+            JSLabel label = JSLabel(baseValue.getLabel().Val());
+            result = baseValue.get(callFrame, property, &label);
+            result.updateLabel(label);
+            // ------------------------------------- //
         }
 
         CHECK_FOR_EXCEPTION();
-        // start modified code
+        // -----------Instrumentation----------- //
         result.updateLabel(baseValue);
         result.updateLabel(subscript);
         result.updateLabel(programCounter.Head());
-        // end modified code
+        // ------------------------------------- //
         callFrame->uncheckedR(dst) = result;
         vPC += OPCODE_LENGTH(op_get_by_val);
         NEXT_INSTRUCTION();
@@ -4456,7 +4470,21 @@ skip_id_custom_self:
         JSGlobalObject* globalObject = callFrame->scopeChain()->globalObject.get();
 
         if (thisValue == globalObject && funcVal == globalObject->evalFunction()) {
+            // Instrumentation
+            // We can use dummy values here because we're popping immediately and we're guaranteed to not have anything left on the stack by the Eval Call
+#if LDEBUG
+            JPRINT("calling eval + pushing");
+#endif
+            programCounter.Push(funcVal.getLabel(), 0, NULL);
+
             JSValue result = callEval(callFrame, registerFile, argv, argCount, registerOffset);
+
+            // Instrumentation
+#if LDEBUG
+            JPRINT("popping after eval");
+#endif
+            programCounter.Pop(); 
+
             if ((exceptionValue = globalData->exception))
                 goto vm_throw;
             functionReturnValue = result;
@@ -4506,7 +4534,8 @@ skip_id_custom_self:
 #if LDEBUG
             JPRINT("calling function");
 #endif
-			//Register* callFrame->registers() //unique identifier
+            // We can use OP_BRANCH here because we will pop before we execute our IPD, which will be the next instruction in the current codeblock.
+            OP_BRANCH(v.getLabel());
             // -------------------------
 
             callFrame = slideRegisterWindowForCall(newCodeBlock, registerFile, callFrame, registerOffset, argCount);

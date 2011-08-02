@@ -750,15 +750,16 @@ inline JSValue JSObject::toPrimitive(ExecState* exec, PreferredPrimitiveType pre
     return defaultValue(exec, preferredType);
 }
 
-inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, JSLabel* label=NULL) const
+inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, JSLabel* l=NULL) const
 {
     PropertySlot slot(asValue());
-    return get(exec, propertyName, slot, label);
+    return get(exec, propertyName, slot, l);
 }
 
-inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, PropertySlot& slot, JSLabel* label=NULL) const
+inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, PropertySlot& slot, JSLabel* l=NULL) const
 {
-	ASSERT(!label);
+    if (l) l->Join(label); //Instrumentation
+
     if (UNLIKELY(!isCell())) {
         JSObject* prototype = synthesizePrototype(exec);
         if (propertyName == exec->propertyNames().underscoreProto)
@@ -772,21 +773,23 @@ inline JSValue JSValue::get(ExecState* exec, const Identifier& propertyName, Pro
         if (cell->fastGetOwnPropertySlot(exec, propertyName, slot))
             return slot.getValue(exec, propertyName);
         JSValue prototype = asObject(cell)->prototype();
+        if (l) l->Join(prototype.getLabel()); //Instrumentation
         if (!prototype.isObject())
             return jsUndefined();
         cell = asObject(prototype);
     }
 }
 
-inline JSValue JSValue::get(ExecState* exec, unsigned propertyName, JSLabel* label=NULL) const
+inline JSValue JSValue::get(ExecState* exec, unsigned propertyName, JSLabel* l=NULL) const
 {
     PropertySlot slot(asValue());
-    return get(exec, propertyName, slot, label);
+    return get(exec, propertyName, slot, l);
 }
 
-inline JSValue JSValue::get(ExecState* exec, unsigned propertyName, PropertySlot& slot, JSLabel* label=NULL) const
+inline JSValue JSValue::get(ExecState* exec, unsigned propertyName, PropertySlot& slot, JSLabel* l=NULL) const
 {
-	ASSERT(!label);
+    if (l) l->Join(label); //Instrumentation
+
     if (UNLIKELY(!isCell())) {
         JSObject* prototype = synthesizePrototype(exec);
         if (!prototype->getPropertySlot(exec, propertyName, slot))
@@ -798,6 +801,7 @@ inline JSValue JSValue::get(ExecState* exec, unsigned propertyName, PropertySlot
         if (cell->getOwnPropertySlot(exec, propertyName, slot))
             return slot.getValue(exec, propertyName);
         JSValue prototype = asObject(cell)->prototype();
+        if (l) l->Join(prototype.getLabel()); //Instrumentation
         if (!prototype.isObject())
             return jsUndefined();
         cell = prototype.asCell();
