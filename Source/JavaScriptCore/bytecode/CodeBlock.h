@@ -217,6 +217,7 @@ namespace JSC {
     public:
         // ---- Instrumentation ----
         StaticAnalyzer analyzer;
+		bool has_analysis;
         // -------------------------
         
         virtual ~CodeBlock();

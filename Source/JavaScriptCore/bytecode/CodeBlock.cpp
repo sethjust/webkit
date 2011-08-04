@@ -1387,6 +1387,7 @@ CodeBlock::CodeBlock(ScriptExecutable* ownerExecutable, CodeType codeType, JSGlo
 
     // ---- Instrumentation ----
     analyzer = StaticAnalyzer();
+	has_analysis = false;
     // -------------------------
 }
 

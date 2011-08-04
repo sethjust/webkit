@@ -28,7 +28,7 @@
  */
 
 //defines for debugging label propogation
-#define LDEBUG true
+#define LDEBUG false
 #define JPRINT(msg) printf("%s at location %d. PC has length %d and head %lx\n", msg, (int) (vPC - codeBlock->instructions().begin()), programCounter.Len(), programCounter.Head().Val());
 //end debugging defines
 
@@ -4475,7 +4475,7 @@ skip_id_custom_self:
 #if LDEBUG
             JPRINT("calling eval + pushing");
 #endif
-            programCounter.Push(funcVal.getLabel(), 0, NULL);
+            programCounter.Push(argv[1].jsValue().getLabel(), 0, NULL);
 
             JSValue result = callEval(callFrame, registerFile, argv, argCount, registerOffset);
 
@@ -4529,7 +4529,10 @@ skip_id_custom_self:
             CallFrame* previousCallFrame = callFrame;
             CodeBlock* newCodeBlock = &callData.js.functionExecutable->generatedBytecodeForCall();
             // ---- Instrumentation ----
-            newCodeBlock->analyzer.genContextTable(newCodeBlock); //TODO: Only call this once per codeblock, if that is possible (it isn't if we recompile with each call)
+			if (!newCodeBlock->has_analysis) {
+				newCodeBlock->analyzer.genContextTable(newCodeBlock); 
+				newCodeBlock->has_analysis = true;
+			}
 			
 #if LDEBUG
             JPRINT("calling function");

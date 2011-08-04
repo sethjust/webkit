@@ -187,6 +187,7 @@ namespace JSC {
         : m_structure(globalData, this, structure)
     {
         ASSERT(m_structure);
+		m_label = JSLabel();
     }
 
     inline JSCell::JSCell(JSGlobalData& globalData, Structure* structure, CreatingEarlyCellTag)
@@ -197,6 +198,7 @@ namespace JSC {
             m_structure.setEarlyValue(globalData, this, structure);
         // Very first set of allocations won't have a real structure.
         ASSERT(m_structure || !globalData.dummyMarkableCellStructure);
+		m_label = JSLabel();
     }
 
     inline JSCell::~JSCell()

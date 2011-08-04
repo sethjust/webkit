@@ -41,7 +41,7 @@ static const double D32 = 4294967296.0;
 // -----------Instrumentation----------- //
     void JSValue:: syncLabel() {
 	if (label.Val() != asCell()->getLabel().Val()) {
-	    printf("syncing values\n");
+	    //printf("syncing values\n");
 	    asCell()->setLabel(label.Join(asCell()->getLabel()));
 	}
 	synced = true;
